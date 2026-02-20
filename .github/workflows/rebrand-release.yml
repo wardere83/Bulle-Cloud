@@ -26,30 +26,26 @@ jobs:
           BASE_URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}"
           mkdir -p assets
 
-          echo "Downloading BrowserOS ${VER} assets via curl..."
+          echo "Downloading BrowserOS ${VER} (${VER_NUM}) assets..."
 
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64_installer.exe" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_x64_installer.exe"
+          dl() {
+            local SRC="$1" DEST="$2"
+            echo "  ${SRC} -> ${DEST}"
+            curl -L --fail \
+              -H "Authorization: token ${GH_TOKEN}" \
+              -o "assets/${DEST}" \
+              "${BASE_URL}/${SRC}"
+          }
 
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64_installer.zip" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_x64_installer.zip"
+          dl "BrowserOS_${VER_NUM}_x64_installer.exe"   "BulleBrowser_${VER_NUM}_x64_installer.exe"
+          dl "BrowserOS_${VER_NUM}_x64_installer.zip"   "BulleBrowser_${VER_NUM}_x64_installer.zip"
+          dl "BrowserOS_${VER_NUM}_universal.dmg"       "BulleBrowser_${VER_NUM}_universal.dmg"
+          dl "BrowserOS_${VER_NUM}_arm64.dmg"           "BulleBrowser_${VER_NUM}_arm64.dmg"
+          dl "BrowserOS_${VER_NUM}_x64.dmg"             "BulleBrowser_${VER_NUM}_x64.dmg"
+          dl "BrowserOS_${VER_NUM}_x64.AppImage"        "BulleBrowser_${VER_NUM}_x64.AppImage"
+          dl "BrowserOS_${VER_NUM}_amd64.deb"           "BulleBrowser_${VER_NUM}_amd64.deb"
 
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_universal.dmg" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_universal.dmg"
-
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_arm64.dmg" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_arm64.dmg"
-
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64.dmg" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_x64.dmg"
-
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64.AppImage" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_x64.AppImage"
-
-          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_amd64.deb" \
-            "${BASE_URL}/BrowserOS_${VER_NUM}_amd64.deb"
-
-          echo "All assets downloaded:"
+          echo "Downloaded and renamed:"
           ls -lh assets/
 
       - name: Upload renamed assets to BulleBrowser release
@@ -58,15 +54,12 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
         run: |
           set -e
-          TARGET="wardere83/Bulle-Cloud"
           VER="${VERSION}"
-
-          echo "Uploading assets to ${TARGET} release ${VER}..."
+          echo "Uploading to wardere83/Bulle-Cloud release ${VER}..."
           for FILE in assets/BulleBrowser_*; do
-            echo "Uploading ${FILE}..."
-            gh release upload "${VER}" \
-              "${FILE}" \
-              --repo "${TARGET}" \
+            echo "  Uploading $(basename ${FILE})..."
+            gh release upload "${VER}" "${FILE}" \
+              --repo "wardere83/Bulle-Cloud" \
               --clobber
           done
-          echo "All BulleBrowser assets uploaded successfully!"
+          echo "All done!"
