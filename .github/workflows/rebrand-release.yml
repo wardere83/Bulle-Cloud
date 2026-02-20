@@ -13,11 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get install -y gh
-
       - name: Download BrowserOS assets and rename to BulleBrowser
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,29 +21,27 @@ jobs:
         run: |
           set -e
           VER="${VERSION}"
-          VER_NUM="${VER#v}"
           mkdir -p assets
-          echo "Version: ${VER}, Num: ${VER_NUM}"
+          echo "Downloading BrowserOS ${VER} assets..."
 
-          dl() {
-            local SRC="$1" DEST="$2"
-            local URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}/${SRC}"
-            echo "  Downloading ${SRC}..."
-            wget -q --show-progress --no-check-certificate \
-              -O "assets/${DEST}" \
-              "${URL}"
-            echo "  Saved as ${DEST}"
-          }
+          FILES=(
+            "BrowserOS_${VER}_amd64.deb"
+            "BrowserOS_${VER}_arm64.dmg"
+            "BrowserOS_${VER}_universal.dmg"
+            "BrowserOS_${VER}_x64.AppImage"
+            "BrowserOS_${VER}_x64.dmg"
+            "BrowserOS_${VER}_x64_installer.exe"
+            "BrowserOS_${VER}_x64_installer.zip"
+          )
 
-          dl "BrowserOS_${VER_NUM}_x64_installer.exe"   "BulleBrowser_${VER_NUM}_x64_installer.exe"
-          dl "BrowserOS_${VER_NUM}_x64_installer.zip"   "BulleBrowser_${VER_NUM}_x64_installer.zip"
-          dl "BrowserOS_${VER_NUM}_universal.dmg"       "BulleBrowser_${VER_NUM}_universal.dmg"
-          dl "BrowserOS_${VER_NUM}_arm64.dmg"           "BulleBrowser_${VER_NUM}_arm64.dmg"
-          dl "BrowserOS_${VER_NUM}_x64.dmg"             "BulleBrowser_${VER_NUM}_x64.dmg"
-          dl "BrowserOS_${VER_NUM}_x64.AppImage"        "BulleBrowser_${VER_NUM}_x64.AppImage"
-          dl "BrowserOS_${VER_NUM}_amd64.deb"           "BulleBrowser_${VER_NUM}_amd64.deb"
+          for SRC in "${FILES[@]}"; do
+            DEST=$(echo "${SRC}" | sed 's/BrowserOS/BulleBrowser/')
+            URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}/${SRC}"
+            echo "  Downloading ${SRC} -> ${DEST}"
+            wget -q --show-progress -O "assets/${DEST}" "${URL}" || echo "  WARNING: Failed to download ${SRC}"
+          done
 
-          echo "All assets ready:"
+          echo "Assets ready:"
           ls -lh assets/
 
       - name: Upload renamed assets to BulleBrowser release
@@ -59,9 +53,11 @@ jobs:
           VER="${VERSION}"
           echo "Uploading to wardere83/Bulle-Cloud release ${VER}..."
           for FILE in assets/BulleBrowser_*; do
-            echo "  Uploading $(basename ${FILE})..."
-            gh release upload "${VER}" "${FILE}" \
-              --repo "wardere83/Bulle-Cloud" \
-              --clobber
+            if [ -f "${FILE}" ]; then
+              echo "  Uploading $(basename ${FILE})..."
+              gh release upload "${VER}" "${FILE}" \
+                --repo "wardere83/Bulle-Cloud" \
+                --clobber
+            fi
           done
           echo "All done!"
