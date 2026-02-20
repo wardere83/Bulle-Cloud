@@ -15,6 +15,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
+
       - name: Download BrowserOS assets and rename to BulleBrowser
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,18 +26,17 @@ jobs:
           set -e
           VER="${VERSION}"
           VER_NUM="${VER#v}"
-          BASE_URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}"
           mkdir -p assets
-
-          echo "Downloading BrowserOS ${VER} (${VER_NUM}) assets..."
+          echo "Version: ${VER}, Num: ${VER_NUM}"
 
           dl() {
             local SRC="$1" DEST="$2"
-            echo "  ${SRC} -> ${DEST}"
-            curl -L --fail \
-              -H "Authorization: token ${GH_TOKEN}" \
-              -o "assets/${DEST}" \
-              "${BASE_URL}/${SRC}"
+            local URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}/${SRC}"
+            echo "  Downloading ${SRC}..."
+            wget -q --show-progress --no-check-certificate \
+              -O "assets/${DEST}" \
+              "${URL}"
+            echo "  Saved as ${DEST}"
           }
 
           dl "BrowserOS_${VER_NUM}_x64_installer.exe"   "BulleBrowser_${VER_NUM}_x64_installer.exe"
@@ -45,7 +47,7 @@ jobs:
           dl "BrowserOS_${VER_NUM}_x64.AppImage"        "BulleBrowser_${VER_NUM}_x64.AppImage"
           dl "BrowserOS_${VER_NUM}_amd64.deb"           "BulleBrowser_${VER_NUM}_amd64.deb"
 
-          echo "Downloaded and renamed:"
+          echo "All assets ready:"
           ls -lh assets/
 
       - name: Upload renamed assets to BulleBrowser release
