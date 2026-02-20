@@ -1,0 +1,75 @@
+name: Rebrand BrowserOS Assets to BulleBrowser
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v0.40.1)'
+        required: true
+        default: 'v0.40.1'
+
+jobs:
+  rebrand-and-upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download BrowserOS assets and rename to BulleBrowser
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+
+          UPSTREAM="browseros-ai/BrowserOS"
+          TARGET="wardere83/Bulle-Cloud"
+          VER="${VERSION}"
+          VER_NUM="${VER#v}"
+
+          echo "Downloading BrowserOS ${VER} assets..."
+
+          # List of assets to download and rename
+          declare -A ASSETS=(
+            ["BrowserOS_${VER_NUM}_x64_installer.exe"]="BulleBrowser_${VER_NUM}_x64_installer.exe"
+            ["BrowserOS_${VER_NUM}_x64_installer.zip"]="BulleBrowser_${VER_NUM}_x64_installer.zip"
+            ["BrowserOS_${VER_NUM}_universal.dmg"]="BulleBrowser_${VER_NUM}_universal.dmg"
+            ["BrowserOS_${VER_NUM}_arm64.dmg"]="BulleBrowser_${VER_NUM}_arm64.dmg"
+            ["BrowserOS_${VER_NUM}_x64.dmg"]="BulleBrowser_${VER_NUM}_x64.dmg"
+            ["BrowserOS_${VER_NUM}_x64.AppImage"]="BulleBrowser_${VER_NUM}_x64.AppImage"
+            ["BrowserOS_${VER_NUM}_amd64.deb"]="BulleBrowser_${VER_NUM}_amd64.deb"
+          )
+
+          mkdir -p assets
+
+          for ORIG in "${!ASSETS[@]}"; do
+            RENAMED="${ASSETS[$ORIG]}"
+            echo "Downloading ${ORIG} -> ${RENAMED}"
+            gh release download "${VER}" \
+              --repo "${UPSTREAM}" \
+              --pattern "${ORIG}" \
+              --dir assets/ \
+              --clobber
+            mv "assets/${ORIG}" "assets/${RENAMED}"
+          done
+
+      - name: Upload renamed assets to BulleBrowser release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+          TARGET="wardere83/Bulle-Cloud"
+          VER="${VERSION}"
+
+          echo "Uploading assets to ${TARGET} release ${VER}..."
+
+          for FILE in assets/BulleBrowser_*; do
+            echo "Uploading ${FILE}..."
+            gh release upload "${VER}" \
+              "${FILE}" \
+              --repo "${TARGET}" \
+              --clobber
+          done
+
+          echo "Done! All BulleBrowser assets uploaded to ${TARGET} ${VER}"
