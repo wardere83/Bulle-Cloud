@@ -15,41 +15,41 @@ jobs:
       contents: write
 
     steps:
-      - name: Download and rename BrowserOS assets to BulleBrowser
+      - name: Download BrowserOS assets and rename to BulleBrowser
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.event.inputs.version }}
         run: |
           set -e
-          UPSTREAM="browseros-ai/BrowserOS"
           VER="${VERSION}"
           VER_NUM="${VER#v}"
+          BASE_URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}"
           mkdir -p assets
 
-          echo "Version: ${VER}, Version number: ${VER_NUM}"
+          echo "Downloading BrowserOS ${VER} assets via curl..."
 
-          download_rename() {
-            local ORIG="$1"
-            local RENAMED="$2"
-            echo "Downloading ${ORIG}..."
-            gh release download "${VER}" \
-              --repo "${UPSTREAM}" \
-              --pattern "${ORIG}" \
-              --dir assets/ \
-              --clobber
-            echo "Renaming to ${RENAMED}..."
-            mv "assets/${ORIG}" "assets/${RENAMED}"
-          }
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64_installer.exe" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_x64_installer.exe"
 
-          download_rename "BrowserOS_${VER_NUM}_x64_installer.exe" "BulleBrowser_${VER_NUM}_x64_installer.exe"
-          download_rename "BrowserOS_${VER_NUM}_x64_installer.zip" "BulleBrowser_${VER_NUM}_x64_installer.zip"
-          download_rename "BrowserOS_${VER_NUM}_universal.dmg" "BulleBrowser_${VER_NUM}_universal.dmg"
-          download_rename "BrowserOS_${VER_NUM}_arm64.dmg" "BulleBrowser_${VER_NUM}_arm64.dmg"
-          download_rename "BrowserOS_${VER_NUM}_x64.dmg" "BulleBrowser_${VER_NUM}_x64.dmg"
-          download_rename "BrowserOS_${VER_NUM}_x64.AppImage" "BulleBrowser_${VER_NUM}_x64.AppImage"
-          download_rename "BrowserOS_${VER_NUM}_amd64.deb" "BulleBrowser_${VER_NUM}_amd64.deb"
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64_installer.zip" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_x64_installer.zip"
 
-          echo "All assets downloaded and renamed:"
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_universal.dmg" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_universal.dmg"
+
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_arm64.dmg" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_arm64.dmg"
+
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64.dmg" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_x64.dmg"
+
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_x64.AppImage" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_x64.AppImage"
+
+          curl -L --fail -o "assets/BulleBrowser_${VER_NUM}_amd64.deb" \
+            "${BASE_URL}/BrowserOS_${VER_NUM}_amd64.deb"
+
+          echo "All assets downloaded:"
           ls -lh assets/
 
       - name: Upload renamed assets to BulleBrowser release
@@ -61,7 +61,7 @@ jobs:
           TARGET="wardere83/Bulle-Cloud"
           VER="${VERSION}"
 
-          echo "Uploading renamed assets to ${TARGET} release ${VER}..."
+          echo "Uploading assets to ${TARGET} release ${VER}..."
           for FILE in assets/BulleBrowser_*; do
             echo "Uploading ${FILE}..."
             gh release upload "${VER}" \
