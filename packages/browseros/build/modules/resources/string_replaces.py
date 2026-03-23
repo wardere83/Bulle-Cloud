@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""String replacement module for BrowserOS build system"""
+"""String replacement module for BulleBrowser build system"""
 
 import re
 from ...common.module import CommandModule, ValidationError
@@ -27,17 +27,17 @@ class StringReplacesModule(CommandModule):
 branding_replacements = [
     (
         r"The Chromium Authors. All rights reserved.",
-        r"The BrowserOS Authors. All rights reserved.",
+        r"The BulleBrowser Authors. All rights reserved.",
     ),
     (
         r"Google LLC. All rights reserved.",
-        r"The BrowserOS Authors. All rights reserved.",
+        r"The BulleBrowser Authors. All rights reserved.",
     ),
-    (r"The Chromium Authors", r"BrowserOS Software Inc"),
-    (r"Google Chrome", r"BrowserOS"),
-    (r"(Google)(?! Play)", r"BrowserOS"),
-    (r"Chromium", r"BrowserOS"),
-    (r"Chrome", r"BrowserOS"),
+    (r"The Chromium Authors", r"BulleBrowser Software Inc"),
+    (r"Google Chrome", r"BulleBrowser"),
+    (r"(Google)(?! Play)", r"BulleBrowser"),
+    (r"Chromium", r"BulleBrowser"),
+    (r"Chrome", r"BulleBrowser"),
 ]
 
 # List of files to apply replacements to
