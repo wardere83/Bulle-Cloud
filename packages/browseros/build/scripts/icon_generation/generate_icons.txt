@@ -1,4 +1,4 @@
-# BrowserOS Icon Generation Configuration
+# BulleBrowser Icon Generation Configuration
 # =========================================
 #
 # Format:
