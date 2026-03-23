@@ -8,8 +8,8 @@ index 0000000000000..da7102fd5b5e3
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
-+// browserOS API for accessing system-level browser functionality
-+namespace browserOS {
++// bulleBrowser API for accessing system-level browser functionality
++namespace bulleBrowser {
 +
 +  // Selection type for choosePath.
 +  // file: Only files can be selected (default).
@@ -365,7 +365,7 @@ index 0000000000000..da7102fd5b5e3
 +    static void getVersionNumber(
 +        GetVersionNumberCallback callback);
 +
-+    // Gets the BrowserOS version number
++    // Gets the BulleBrowser version number
 +    // |callback|: Called with the version string.
 +    static void getBrowserosVersionNumber(
 +        GetVersionNumberCallback callback);
