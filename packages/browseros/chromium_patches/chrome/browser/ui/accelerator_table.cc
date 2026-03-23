@@ -14,7 +14,7 @@ index 171a1037969db..e5f17e5be1047 100644
      }
  #endif
  
-+    if (base::FeatureList::IsEnabled(features::kBrowserOsKeyboardShortcuts)) {
++    if (base::FeatureList::IsEnabled(features::kBulleBrowserKeyboardShortcuts)) {
 +      accelerators->push_back(
 +          {ui::VKEY_K, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
 +           IDC_SHOW_THIRD_PARTY_LLM_SIDE_PANEL});
@@ -22,7 +22,7 @@ index 171a1037969db..e5f17e5be1047 100644
 +          {ui::VKEY_L, ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR,
 +           IDC_CYCLE_THIRD_PARTY_LLM_PROVIDER});
 +      accelerators->push_back(
-+          {ui::VKEY_A, ui::EF_ALT_DOWN, IDC_TOGGLE_BROWSEROS_AGENT});
++          {ui::VKEY_A, ui::EF_ALT_DOWN, IDC_TOGGLE_BULLEBROWSER_AGENT});
 +    }
 +
      if (base::FeatureList::IsEnabled(features::kUIDebugTools)) {
