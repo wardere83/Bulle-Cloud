@@ -1,8 +1,8 @@
-diff --git a/chrome/browser/resources/settings/browseros_prefs_page/browseros_prefs_page.html b/chrome/browser/resources/settings/browseros_prefs_page/browseros_prefs_page.html
+diff --git a/chrome/browser/resources/settings/BulleBrowser_prefs_page/BulleBrowser_prefs_page.html b/chrome/browser/resources/settings/BulleBrowser_prefs_page/BulleBrowser_prefs_page.html
 new file mode 100644
 index 0000000000000..f7766f378ba0a
 --- /dev/null
-+++ b/chrome/browser/resources/settings/browseros_prefs_page/browseros_prefs_page.html
++++ b/chrome/browser/resources/settings/BulleBrowser_prefs_page/BulleBrowser_prefs_page.html
 @@ -0,0 +1,336 @@
 +    <link rel="import" href="../controls/settings_toggle_button.html">
 +    <style include="cr-shared-style settings-shared md-select">
@@ -246,8 +246,8 @@ index 0000000000000..f7766f378ba0a
 +        <cr-icon icon="settings:settings"></cr-icon>
 +      </div>
 +      <div>
-+        <h1 class="page-title">BrowserOS Preferences</h1>
-+        <div class="page-subtitle">Configure BrowserOS-specific settings</div>
++        <h1 class="page-title">BulleBrowser Preferences</h1>
++        <div class="page-subtitle">Configure BulleBrowser-specific settings</div>
 +      </div>
 +    </div>
 +    
@@ -260,14 +260,14 @@ index 0000000000000..f7766f378ba0a
 +        <div class="prefs-toggle-row">
 +          <div>
 +            <div class="prefs-toggle-label">Show labels in toolbar</div>
-+            <div class="prefs-toggle-sublabel">Display text labels next to BrowserOS toolbar icons</div>
++            <div class="prefs-toggle-sublabel">Display text labels next to BulleBrowser toolbar icons</div>
 +            <div class="prefs-toggle-sublabel" style="color: var(--google-orange-600); font-weight: 500; margin-top: 4px;">
 +              NOTE: Needs browser restart
 +            </div>
 +          </div>
 +          <settings-toggle-button
 +              id="showToolbarLabels"
-+              pref="{{prefs.browseros.show_toolbar_labels}}">
++              pref="{{prefs.BulleBrowser.show_toolbar_labels}}">
 +          </settings-toggle-button>
 +        </div>
 +      </div>
