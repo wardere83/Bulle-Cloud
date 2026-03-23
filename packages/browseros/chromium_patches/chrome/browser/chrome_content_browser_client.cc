@@ -6,7 +6,7 @@ index 0ab10486a183c..e25fbac661e4d 100644
  #endif
  
  #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-+#include "chrome/browser/browseros/core/browseros_constants.h"
++#include "chrome/browser/bullebrowser/core/bullebrowser_constants.h"
  #include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"
  #include "chrome/browser/extensions/chrome_extension_cookies.h"
  #include "extensions/browser/api/web_request/web_request_api.h"
@@ -23,17 +23,17 @@ index 0ab10486a183c..e25fbac661e4d 100644
               prefs.root_scrollbar_theme_color;
  }
  
-+// Handles chrome://browseros/* URLs by rewriting to extension URLs.
-+// Forward handler: chrome://browseros/ai -> chrome-extension://[id]/options.html
-+static bool HandleBrowserOSURL(GURL* url,
++// Handles chrome://bullebrowser/* URLs by rewriting to extension URLs.
++// Forward handler: chrome://bullebrowser/ai -> chrome-extension://[id]/options.html
++static bool HandleBulleBrowserURL(GURL* url,
 +                               content::BrowserContext* browser_context) {
 +  if (!url->SchemeIs(content::kChromeUIScheme) ||
-+      url->host() != browseros::kBrowserOSHost) {
++      url->host() != bullebrowser::kBulleBrowserHost) {
 +    return false;
 +  }
 +
 +  std::string extension_url =
-+      browseros::GetBrowserOSExtensionURL(url->path());
++      bullebrowser::GetBulleBrowserExtensionURL(url->path());
 +  if (extension_url.empty()) {
 +    return false;
 +  }
@@ -42,15 +42,15 @@ index 0ab10486a183c..e25fbac661e4d 100644
 +  return true;
 +}
 +
-+// Reverse handler: chrome-extension://[id]/options.html#ai -> chrome://browseros/ai
++// Reverse handler: chrome-extension://[id]/options.html#ai -> chrome://bullebrowser/ai
 +// This ensures the virtual URL is shown in the address bar.
-+static bool ReverseBrowserOSURL(GURL* url,
++static bool ReverseBulleBrowserURL(GURL* url,
 +                                content::BrowserContext* browser_context) {
 +  if (!url->SchemeIs(extensions::kExtensionScheme)) {
 +    return false;
 +  }
 +
-+  std::string virtual_url = browseros::GetBrowserOSVirtualURL(
++  std::string virtual_url = bullebrowser::GetBulleBrowserVirtualURL(
 +      url->host(), url->path(), url->ref());
 +  if (virtual_url.empty()) {
 +    return false;
@@ -67,12 +67,12 @@ index 0ab10486a183c..e25fbac661e4d 100644
    handler->AddHandlerPair(&HandleChromeAboutAndChromeSyncRewrite,
                            BrowserURLHandler::null_handler());
  
-+  // Handler to rewrite chrome://browseros/* to extension URLs.
-+  handler->AddHandlerPair(&HandleBrowserOSURL, &ReverseBrowserOSURL);
++  // Handler to rewrite chrome://bullebrowser/* to extension URLs.
++  handler->AddHandlerPair(&HandleBulleBrowserURL, &ReverseBulleBrowserURL);
 +  // Reverse-only handler for when extension opens its URL directly
 +  // (e.g., chrome.tabs.create({url: 'options.html#ai'}))
 +  handler->AddHandlerPair(BrowserURLHandler::null_handler(),
-+                          &ReverseBrowserOSURL);
++                          &ReverseBulleBrowserURL);
 +
  #if BUILDFLAG(IS_ANDROID)
    // Handler to rewrite chrome://newtab on Android.
@@ -82,10 +82,10 @@ index 0ab10486a183c..e25fbac661e4d 100644
      content::BrowserContext* browser_context,
      const url::Origin& origin) {
 +#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-+  // Allow BrowserOS extensions to access private networks (e.g., localhost).
++  // Allow BulleBrowser extensions to access private networks (e.g., localhost).
 +  // This enables extension service workers to connect to local servers.
 +  if (origin.scheme() == extensions::kExtensionScheme &&
-+      browseros::IsBrowserOSExtension(origin.host())) {
++      bullebrowser::IsBulleBrowserExtension(origin.host())) {
 +    return PrivateNetworkRequestPolicyOverride::kForceAllow;
 +  }
 +#endif
