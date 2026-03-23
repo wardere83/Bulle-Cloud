@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Windows signing module for BrowserOS"""
+"""Windows signing module for BulleBrowser"""
 
 import subprocess
 from pathlib import Path
@@ -16,8 +16,8 @@ from ...common.utils import (
     IS_WINDOWS,
 )
 
-BROWSEROS_SERVER_BINARIES: List[str] = [
-    "browseros_server.exe",
+BulleBrowser_SERVER_BINARIES: List[str] = [
+    "BulleBrowser_server.exe",
     "codex.exe",
 ]
 
@@ -65,7 +65,7 @@ class WindowsSignModule(CommandModule):
     def _sign_executables(self, build_output_dir: Path, env: EnvConfig) -> None:
         log_info("\nStep 1/3: Signing executables before packaging...")
         binaries_to_sign_first = [build_output_dir / "chrome.exe"]
-        binaries_to_sign_first.extend(get_browseros_server_binary_paths(build_output_dir))
+        binaries_to_sign_first.extend(get_BulleBrowser_server_binary_paths(build_output_dir))
 
         existing_binaries = []
         for binary in binaries_to_sign_first:
@@ -98,10 +98,10 @@ class WindowsSignModule(CommandModule):
         return mini_installer_path
 
 
-def get_browseros_server_binary_paths(build_output_dir: Path) -> List[Path]:
-    """Return absolute paths to BrowserOS Server binaries for signing."""
-    server_dir = build_output_dir / "BrowserOSServer" / "default" / "resources" / "bin"
-    return [server_dir / binary for binary in BROWSEROS_SERVER_BINARIES]
+def get_BulleBrowser_server_binary_paths(build_output_dir: Path) -> List[Path]:
+    """Return absolute paths to BulleBrowser Server binaries for signing."""
+    server_dir = build_output_dir / "BulleBrowserServer" / "default" / "resources" / "bin"
+    return [server_dir / binary for binary in BulleBrowser_SERVER_BINARIES]
 
 
 def build_mini_installer(ctx: Context) -> bool:
