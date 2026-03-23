@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Notification system for BrowserOS build pipeline"""
+"""Notification system for BulleBrowser build pipeline"""
 
 import os
 import threading
@@ -30,8 +30,8 @@ def _get_context_prefix() -> str:
 def _get_context_footer() -> str:
     """Get OS footer if context is set"""
     if "os" in _build_context:
-        return f"BrowserOS Build System - {_build_context['os']}"
-    return "BrowserOS Build System"
+        return f"BulleBrowser Build System - {_build_context['os']}"
+    return "BulleBrowser Build System"
 
 
 class Notifier:
