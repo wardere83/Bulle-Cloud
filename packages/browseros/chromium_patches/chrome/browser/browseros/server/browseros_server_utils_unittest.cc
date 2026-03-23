@@ -1,14 +1,14 @@
-diff --git a/chrome/browser/browseros/server/browseros_server_utils_unittest.cc b/chrome/browser/browseros/server/browseros_server_utils_unittest.cc
+diff --git a/chrome/browser/bullebrowser/server/bullebrowser_server_utils_unittest.cc b/chrome/browser/bullebrowser/server/bullebrowser_server_utils_unittest.cc
 new file mode 100644
 index 0000000000000..ad434d78b5e68
 --- /dev/null
-+++ b/chrome/browser/browseros/server/browseros_server_utils_unittest.cc
++++ b/chrome/browser/bullebrowser/server/bullebrowser_server_utils_unittest.cc
 @@ -0,0 +1,91 @@
 +// Copyright 2024 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
-+#include "chrome/browser/browseros/server/browseros_server_utils.h"
++#include "chrome/browser/bullebrowser/server/bullebrowser_server_utils.h"
 +
 +#include <set>
 +
@@ -17,7 +17,7 @@ index 0000000000000..ad434d78b5e68
 +#include "base/files/scoped_temp_dir.h"
 +#include "testing/gtest/include/gtest/gtest.h"
 +
-+namespace browseros::server_utils {
++namespace bullebrowser::server_utils {
 +namespace {
 +
 +// =============================================================================
@@ -94,4 +94,4 @@ index 0000000000000..ad434d78b5e68
 +}
 +
 +}  // namespace
-+}  // namespace browseros::server_utils
++}  // namespace bullebrowser::server_utils
