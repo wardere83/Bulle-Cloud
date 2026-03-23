@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Patch management module for BrowserOS build system"""
-
+"""Patch management module for BulleBrowser build system"""
 import shutil
 from ...common.module import CommandModule, ValidationError
 from ...common.context import Context
@@ -10,8 +9,7 @@ from ...common.utils import log_info, log_error
 class PatchesModule(CommandModule):
     produces = []
     requires = []
-    description = "Apply BrowserOS patches to Chromium"
-
+    description = "Apply BulleBrowser patches to Chromium"
     def validate(self, ctx: Context) -> None:
         if not shutil.which("git"):
             raise ValidationError(
