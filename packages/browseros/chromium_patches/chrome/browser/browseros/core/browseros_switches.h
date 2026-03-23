@@ -1,74 +1,74 @@
-diff --git a/chrome/browser/browseros/core/browseros_switches.h b/chrome/browser/browseros/core/browseros_switches.h
+diff --git a/chrome/browser/bullebrowser/core/bullebrowser_switches.h b/chrome/browser/bullebrowser/core/bullebrowser_switches.h
 new file mode 100644
 index 0000000000000..dcd8b3ae307f2
 --- /dev/null
-+++ b/chrome/browser/browseros/core/browseros_switches.h
++++ b/chrome/browser/bullebrowser/core/bullebrowser_switches.h
 @@ -0,0 +1,86 @@
 +// Copyright 2024 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
-+#ifndef CHROME_BROWSER_BROWSEROS_CORE_BROWSEROS_SWITCHES_H_
-+#define CHROME_BROWSER_BROWSEROS_CORE_BROWSEROS_SWITCHES_H_
++#ifndef CHROME_BROWSER_BULLEBROWSER_CORE_BULLEBROWSER_SWITCHES_H_
++#define CHROME_BROWSER_BULLEBROWSER_CORE_BULLEBROWSER_SWITCHES_H_
 +
-+namespace browseros {
++namespace bullebrowser {
 +
 +// =============================================================================
-+// BrowserOS Command-Line Switches
++// BulleBrowser Command-Line Switches
 +// =============================================================================
-+// All BrowserOS-specific command-line flags are defined here.
++// All BulleBrowser-specific command-line flags are defined here.
 +// Usage: --flag-name or --flag-name=value
 +
 +// === Server Switches ===
 +
-+// Disables the BrowserOS server entirely.
-+inline constexpr char kDisableServer[] = "disable-browseros-server";
++// Disables the BulleBrowser server entirely.
++inline constexpr char kDisableServer[] = "disable-bullebrowser-server";
 +
-+// Disables the BrowserOS server OTA updater.
-+inline constexpr char kDisableServerUpdater[] = "disable-browseros-server-updater";
++// Disables the BulleBrowser server OTA updater.
++inline constexpr char kDisableServerUpdater[] = "disable-bullebrowser-server-updater";
 +
 +// Overrides the appcast URL for server updates (testing).
-+inline constexpr char kServerAppcastUrl[] = "browseros-server-appcast-url";
++inline constexpr char kServerAppcastUrl[] = "bullebrowser-server-appcast-url";
 +
 +// Overrides the server resources directory path.
-+inline constexpr char kServerResourcesDir[] = "browseros-server-resources-dir";
++inline constexpr char kServerResourcesDir[] = "bullebrowser-server-resources-dir";
 +
 +// Overrides the CDP (Chrome DevTools Protocol) port.
-+inline constexpr char kCDPPort[] = "browseros-cdp-port";
++inline constexpr char kCDPPort[] = "bullebrowser-cdp-port";
 +
 +// Overrides the stable MCP proxy port (what external clients connect to).
-+inline constexpr char kProxyPort[] = "browseros-proxy-port";
++inline constexpr char kProxyPort[] = "bullebrowser-proxy-port";
 +
 +// Overrides the sidecar backend server port.
-+inline constexpr char kServerPort[] = "browseros-server-port";
++inline constexpr char kServerPort[] = "bullebrowser-server-port";
 +
 +// Overrides the Agent server port.
-+inline constexpr char kAgentPort[] = "browseros-agent-port";
++inline constexpr char kAgentPort[] = "bullebrowser-agent-port";
 +
 +// Overrides the Extension server port.
-+inline constexpr char kExtensionPort[] = "browseros-extension-port";
++inline constexpr char kExtensionPort[] = "bullebrowser-extension-port";
 +
 +// === Extension Switches ===
 +
-+// Disables BrowserOS managed extensions.
-+inline constexpr char kDisableExtensions[] = "disable-browseros-extensions";
++// Disables BulleBrowser managed extensions.
++inline constexpr char kDisableExtensions[] = "disable-bullebrowser-extensions";
 +
 +// Overrides the extensions config URL.
-+inline constexpr char kExtensionsUrl[] = "browseros-extensions-url";
++inline constexpr char kExtensionsUrl[] = "bullebrowser-extensions-url";
 +
 +// === URL Override Switches ===
 +
-+// Disables chrome://browseros/* URL overrides.
++// Disables chrome://bullebrowser/* URL overrides.
 +// Useful for debugging to see raw extension URLs.
-+inline constexpr char kDisableUrlOverrides[] = "browseros-disable-url-overrides";
++inline constexpr char kDisableUrlOverrides[] = "bullebrowser-disable-url-overrides";
 +
 +// === Sparkle Switches (macOS Browser Updates) ===
 +
 +// Overrides the Sparkle appcast URL for browser updates.
-+inline constexpr char kSparkleUrl[] = "browseros-sparkle-url";
++inline constexpr char kSparkleUrl[] = "bullebrowser-sparkle-url";
 +
 +// Forces an immediate Sparkle update check.
-+inline constexpr char kSparkleForceCheck[] = "browseros-sparkle-force-check";
++inline constexpr char kSparkleForceCheck[] = "bullebrowser-sparkle-force-check";
 +
 +// Runs Sparkle in dry-run mode (no actual updates).
 +inline constexpr char kSparkleDryRun[] = "sparkle-dry-run";
@@ -84,9 +84,9 @@ index 0000000000000..dcd8b3ae307f2
 +
 +// === Misc Switches ===
 +
-+// Indicates this is the first run of BrowserOS.
-+inline constexpr char kFirstRun[] = "browseros-first-run";
++// Indicates this is the first run of BulleBrowser.
++inline constexpr char kFirstRun[] = "bullebrowser-first-run";
 +
-+}  // namespace browseros
++}  // namespace bullebrowser
 +
-+#endif  // CHROME_BROWSER_BROWSEROS_CORE_BROWSEROS_SWITCHES_H_
++#endif  // CHROME_BROWSER_BULLEBROWSER_CORE_BULLEBROWSER_SWITCHES_H_
