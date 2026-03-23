@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cloudflare R2 client utilities for BrowserOS build system
+"""Cloudflare R2 client utilities for BulleBrowser build system
 
 This module provides shared R2 (S3-compatible) operations used by both
 upload and download modules.
