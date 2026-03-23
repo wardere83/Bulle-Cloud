@@ -16,9 +16,9 @@ Design:
         4. sign universal -> package -> upload
 
     Output: 3 DMGs uploaded:
-        - BrowserOS_{version}_arm64_signed.dmg
-        - BrowserOS_{version}_x64_signed.dmg
-        - BrowserOS_{version}_universal_signed.dmg
+        - BulleBrowser_{version}_arm64_signed.dmg
+        - BulleBrowser_{version}_x64_signed.dmg
+        - BulleBrowser_{version}_universal_signed.dmg
 
 Prerequisites (must run BEFORE this module):
     - clean (optional)
@@ -61,9 +61,9 @@ class UniversalBuildModule(CommandModule):
     it will be ignored and arm64/x64 will be built explicitly.
 
     Output artifacts:
-        - BrowserOS_{version}_arm64_signed.dmg
-        - BrowserOS_{version}_x64_signed.dmg
-        - BrowserOS_{version}_universal_signed.dmg
+        - BulleBrowser_{version}_arm64_signed.dmg
+        - BulleBrowser_{version}_x64_signed.dmg
+        - BulleBrowser_{version}_universal_signed.dmg
     """
 
     produces = ["dmg_arm64", "dmg_x64", "dmg_universal"]
@@ -125,11 +125,11 @@ class UniversalBuildModule(CommandModule):
             arch_ctx = self._create_arch_context(ctx, arch)
 
             log_info(f"📍 Chromium: {arch_ctx.chromium_version}")
-            log_info(f"📍 BrowserOS: {arch_ctx.browseros_build_offset}")
+            log_info(f"📍 BulleBrowser: {arch_ctx.BulleBrowser_build_offset}")
             log_info(f"📍 Output directory: {arch_ctx.out_dir}")
 
             # === BUILD PHASE ===
-            # Copy resources (arch-specific binaries like browseros_server, codex)
+            # Copy resources (arch-specific binaries like BulleBrowser_server, codex)
             log_info(f"\n📦 Copying resources for {arch}...")
             ResourcesModule().execute(arch_ctx)
 
@@ -176,7 +176,7 @@ class UniversalBuildModule(CommandModule):
         self._merge_universal(ctx, built_apps[0], built_apps[1])
 
         # Verify universal binary was created
-        universal_app = ctx.chromium_src / "out/Default_universal/BrowserOS.app"
+        universal_app = ctx.chromium_src / "out/Default_universal/BulleBrowser.app"
         if not universal_app.exists():
             raise RuntimeError(f"Universal binary not found: {universal_app}")
 
@@ -267,7 +267,7 @@ class UniversalBuildModule(CommandModule):
         # This is critical: after arm64 is built, get_app_path() would otherwise
         # try to detect the universal dir for x64 context
         ctx._fixed_app_path = (
-            ctx.chromium_src / f"out/Default_{arch}" / ctx.BROWSEROS_APP_NAME
+            ctx.chromium_src / f"out/Default_{arch}" / ctx.BulleBrowser_APP_NAME
         )
         return ctx
 
@@ -288,7 +288,7 @@ class UniversalBuildModule(CommandModule):
         )
         # Set fixed app path to the universal binary
         ctx._fixed_app_path = (
-            ctx.chromium_src / "out/Default_universal" / ctx.BROWSEROS_APP_NAME
+            ctx.chromium_src / "out/Default_universal" / ctx.BulleBrowser_APP_NAME
         )
         # Override out_dir for universal
         ctx.out_dir = "out/Default_universal"
@@ -318,7 +318,7 @@ class UniversalBuildModule(CommandModule):
 
         # Create universal directory (already cleaned in _clean_build_directories)
         universal_dir.mkdir(parents=True, exist_ok=True)
-        universal_app = universal_dir / "BrowserOS.app"
+        universal_app = universal_dir / "BulleBrowser.app"
 
         # Find universalizer script
         universalizer_script = (
