@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pipeline validation for BrowserOS build system"""
+"""Pipeline validation for BulleBrowser build system"""
 
 from typing import Dict, List, Type
 from .module import CommandModule
