@@ -1,25 +1,25 @@
-diff --git a/chrome/browser/browseros/server/browseros_server_constants.h b/chrome/browser/browseros/server/browseros_server_constants.h
+diff --git a/chrome/browser/bullebrowser/server/bullebrowser_server_constants.h b/chrome/browser/bullebrowser/server/bullebrowser_server_constants.h
 new file mode 100644
 index 0000000000000..d2c8229f8c805
 --- /dev/null
-+++ b/chrome/browser/browseros/server/browseros_server_constants.h
++++ b/chrome/browser/bullebrowser/server/bullebrowser_server_constants.h
 @@ -0,0 +1,52 @@
 +// Copyright 2024 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
-+#ifndef CHROME_BROWSER_BROWSEROS_SERVER_BROWSEROS_SERVER_CONSTANTS_H_
-+#define CHROME_BROWSER_BROWSEROS_SERVER_BROWSEROS_SERVER_CONSTANTS_H_
++#ifndef CHROME_BROWSER_BULLEBROWSER_SERVER_BULLEBROWSER_SERVER_CONSTANTS_H_
++#define CHROME_BROWSER_BULLEBROWSER_SERVER_BULLEBROWSER_SERVER_CONSTANTS_H_
 +
 +#include "base/time/time.h"
 +
-+namespace browseros_server {
++namespace bullebrowser_server {
 +
 +// Appcast URLs for checking server updates
 +inline constexpr char kDefaultAppcastUrl[] =
-+    "https://cdn.browseros.com/appcast-server.xml";
++    "https://cdn.bullebrowser.com/appcast-server.xml";
 +inline constexpr char kAlphaAppcastUrl[] =
-+    "https://cdn.browseros.com/appcast-server.alpha.xml";
++    "https://cdn.bullebrowser.com/appcast-server.alpha.xml";
 +
 +// Interval between update checks
 +inline constexpr base::TimeDelta kUpdateCheckInterval = base::Minutes(15);
@@ -53,6 +53,6 @@ index 0000000000000..d2c8229f8c805
 +inline constexpr char kPendingUpdateDirectoryName[] = "pending_update";
 +inline constexpr char kDownloadFileName[] = "download.zip";
 +
-+}  // namespace browseros_server
++}  // namespace bullebrowser_server
 +
-+#endif  // CHROME_BROWSER_BROWSEROS_SERVER_BROWSEROS_SERVER_CONSTANTS_H_
++#endif  // CHROME_BROWSER_BULLEBROWSER_SERVER_BULLEBROWSER_SERVER_CONSTANTS_H_
