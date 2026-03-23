@@ -39,7 +39,7 @@ class ArtifactRegistry:
 
     Example:
         artifacts = ArtifactRegistry()
-        artifacts.add("built_app", Path("/path/to/BrowserOS.app"))
+        artifacts.add("built_app", Path("/path/to/BulleBrowser.app"))
         app_path = artifacts.get("built_app")
         if artifacts.has("signed_app"):
             ...
@@ -148,13 +148,13 @@ class BuildConfig:
         self.architecture = architecture or get_platform_arch()
         self.build_type = build_type
         self.chromium_version = ""
-        self.browseros_version = ""
-        self.browseros_chromium_version = ""
+        self.BulleBrowser_version = ""
+        self.BulleBrowser_chromium_version = ""
 
         # App names - will be set based on platform
         self.CHROMIUM_APP_NAME = ""
-        self.BROWSEROS_APP_NAME = ""
-        self.BROWSEROS_APP_BASE_NAME = "BulleBrowser"
+        self.BulleBrowser_APP_NAME = ""
+        self.BulleBrowser_APP_BASE_NAME = "BulleBrowser"
 
         # Third party versions
         self.SPARKLE_VERSION = "2.7.0"
@@ -166,15 +166,15 @@ class BuildConfig:
         """Set platform-specific application names"""
         if IS_WINDOWS():
             self.CHROMIUM_APP_NAME = f"chrome{get_executable_extension()}"
-            self.BROWSEROS_APP_NAME = (
-                f"{self.BROWSEROS_APP_BASE_NAME}{get_executable_extension()}"
+            self.BulleBrowser_APP_NAME = (
+                f"{self.BulleBrowser_APP_BASE_NAME}{get_executable_extension()}"
             )
         elif IS_MACOS():
             self.CHROMIUM_APP_NAME = "Chromium.app"
-            self.BROWSEROS_APP_NAME = f"{self.BROWSEROS_APP_BASE_NAME}.app"
+            self.BulleBrowser_APP_NAME = f"{self.BulleBrowser_APP_BASE_NAME}.app"
         else:
             self.CHROMIUM_APP_NAME = "chrome"
-            self.BROWSEROS_APP_NAME = self.BROWSEROS_APP_BASE_NAME.lower()
+            self.BulleBrowser_APP_NAME = self.BulleBrowser_APP_BASE_NAME.lower()
 
 
 @dataclass
@@ -189,17 +189,17 @@ class Context:
     architecture: str = ""  # Will be set in __post_init__
     build_type: str = "debug"
     chromium_version: str = ""
-    browseros_build_offset: str = ""
-    browseros_chromium_version: str = ""
-    semantic_version: str = ""  # e.g., "0.31.0" from resources/BROWSEROS_VERSION
+    BulleBrowser_build_offset: str = ""
+    BulleBrowser_chromium_version: str = ""
+    semantic_version: str = ""  # e.g., "0.31.0" from resources/BulleBrowser_VERSION
     release_version: str = ""  # Explicit version for release operations (overrides semantic_version)
     github_repo: str = ""  # GitHub repo for release operations (owner/repo)
     start_time: float = 0.0
 
     # App names - will be set based on platform
     CHROMIUM_APP_NAME: str = ""
-    BROWSEROS_APP_NAME: str = ""
-    BROWSEROS_APP_BASE_NAME: str = "BulleBrowser"  # Base name without extension
+    BulleBrowser_APP_NAME: str = ""
+    BulleBrowser_APP_BASE_NAME: str = "BulleBrowser"  # Base name without extension
 
     # Third party
     SPARKLE_VERSION: str = "2.7.0"
@@ -238,19 +238,19 @@ class Context:
         # Set platform-specific app names
         if IS_WINDOWS():
             self.CHROMIUM_APP_NAME = f"chrome{get_executable_extension()}"
-            self.BROWSEROS_APP_NAME = (
-                f"{self.BROWSEROS_APP_BASE_NAME}{get_executable_extension()}"
+            self.BulleBrowser_APP_NAME = (
+                f"{self.BulleBrowser_APP_BASE_NAME}{get_executable_extension()}"
             )
         elif IS_MACOS():
             self.CHROMIUM_APP_NAME = "Chromium.app"
-            self.BROWSEROS_APP_NAME = f"{self.BROWSEROS_APP_BASE_NAME}.app"
+            self.BulleBrowser_APP_NAME = f"{self.BulleBrowser_APP_BASE_NAME}.app"
         else:
             self.CHROMIUM_APP_NAME = "chrome"
-            self.BROWSEROS_APP_NAME = self.BROWSEROS_APP_BASE_NAME.lower()
+            self.BulleBrowser_APP_NAME = self.BulleBrowser_APP_BASE_NAME.lower()
 
         # Sync with BuildConfig
         self.build.CHROMIUM_APP_NAME = self.CHROMIUM_APP_NAME
-        self.build.BROWSEROS_APP_NAME = self.BROWSEROS_APP_NAME
+        self.build.BulleBrowser_APP_NAME = self.BulleBrowser_APP_NAME
 
         # Set architecture-specific output directory with platform separator
         if IS_WINDOWS():
@@ -270,25 +270,25 @@ class Context:
             # If chromium_version was provided, we still need to parse it for version_dict
             version_dict = {}
 
-        if not self.browseros_build_offset:
-            self.browseros_build_offset = self._load_browseros_build_offset(
+        if not self.BulleBrowser_build_offset:
+            self.BulleBrowser_build_offset = self._load_BulleBrowser_build_offset(
                 self.root_dir
             )
 
-        # Load semantic version from resources/BROWSEROS_VERSION
+        # Load semantic version from resources/BulleBrowser_VERSION
         if not self.semantic_version:
             self.semantic_version = self._load_semantic_version(self.root_dir)
 
         # Set nxtscape_chromium_version as chromium version with BUILD + nxtscape_version
-        if self.chromium_version and self.browseros_build_offset and version_dict:
+        if self.chromium_version and self.BulleBrowser_build_offset and version_dict:
             # Calculate new BUILD number by adding nxtscape_version to original BUILD
-            new_build = int(version_dict["BUILD"]) + int(self.browseros_build_offset)
-            self.browseros_chromium_version = f"{version_dict['MAJOR']}.{version_dict['MINOR']}.{new_build}.{version_dict['PATCH']}"
+            new_build = int(version_dict["BUILD"]) + int(self.BulleBrowser_build_offset)
+            self.BulleBrowser_chromium_version = f"{version_dict['MAJOR']}.{version_dict['MINOR']}.{new_build}.{version_dict['PATCH']}"
 
         # Sync versions with BuildConfig
         self.build.chromium_version = self.chromium_version
-        self.build.browseros_version = self.browseros_build_offset
-        self.build.browseros_chromium_version = self.browseros_chromium_version
+        self.build.BulleBrowser_version = self.BulleBrowser_build_offset
+        self.build.BulleBrowser_chromium_version = self.BulleBrowser_chromium_version
 
         # Sync chromium_src with PathConfig (validation done by resolver)
         self.paths.chromium_src = self.chromium_src
@@ -345,26 +345,26 @@ class Context:
         return "", version_dict
 
     @staticmethod
-    def _load_browseros_build_offset(root_dir: Path) -> str:
-        """Load browseros build offset from config/BROWSEROS_BUILD_OFFSET"""
-        version_file = join_paths(root_dir, "build", "config", "BROWSEROS_BUILD_OFFSET")
+    def _load_BulleBrowser_build_offset(root_dir: Path) -> str:
+        """Load BulleBrowser build offset from config/BulleBrowser_BUILD_OFFSET"""
+        version_file = join_paths(root_dir, "build", "config", "BulleBrowser_BUILD_OFFSET")
         if version_file.exists():
             return version_file.read_text().strip()
         return ""
 
     @staticmethod
     def _load_semantic_version(root_dir: Path) -> str:
-        """Load semantic version from resources/BROWSEROS_VERSION
+        """Load semantic version from resources/BulleBrowser_VERSION
 
         File format:
-            BROWSEROS_MAJOR=0
-            BROWSEROS_MINOR=31
-            BROWSEROS_BUILD=0
-            BROWSEROS_PATCH=0
+            BulleBrowser_MAJOR=0
+            BulleBrowser_MINOR=31
+            BulleBrowser_BUILD=0
+            BulleBrowser_PATCH=0
 
         Returns: "0.31.0" (PATCH only included if non-zero)
         """
-        version_file = join_paths(root_dir, "resources", "BROWSEROS_VERSION")
+        version_file = join_paths(root_dir, "resources", "BulleBrowser_VERSION")
         if not version_file.exists():
             return ""
 
@@ -376,10 +376,10 @@ class Context:
             key, value = line.split("=", 1)
             version_dict[key.strip()] = value.strip()
 
-        major = version_dict.get("BROWSEROS_MAJOR", "0")
-        minor = version_dict.get("BROWSEROS_MINOR", "0")
-        build = version_dict.get("BROWSEROS_BUILD", "0")
-        patch = version_dict.get("BROWSEROS_PATCH", "0")
+        major = version_dict.get("BulleBrowser_MAJOR", "0")
+        minor = version_dict.get("BulleBrowser_MINOR", "0")
+        build = version_dict.get("BulleBrowser_BUILD", "0")
+        patch = version_dict.get("BulleBrowser_PATCH", "0")
 
         # Include patch only if non-zero
         if patch != "0":
@@ -423,7 +423,7 @@ class Context:
 
     def get_extensions_manifest_url(self) -> str:
         """Get CDN URL for bundled extensions update manifest"""
-        return "https://cdn.browseros.com/extensions/update-manifest.xml"
+        return "https://cdn.BulleBrowser.com/extensions/update-manifest.xml"
 
     def get_entitlements_dir(self) -> Path:
         """Get entitlements directory"""
@@ -436,7 +436,7 @@ class Context:
     def get_app_path(self) -> Path:
         """Get built app path
 
-        For universal builds, checks if out/Default_universal/BrowserOS.app exists
+        For universal builds, checks if out/Default_universal/BulleBrowser.app exists
         and returns that instead of the architecture-specific path.
 
         This allows downstream modules (sign, package) to work on the universal
@@ -452,7 +452,7 @@ class Context:
         # Check for universal binary first (macOS only)
         if IS_MACOS():
             universal_app = join_paths(
-                self.chromium_src, "out/Default_universal", self.BROWSEROS_APP_NAME
+                self.chromium_src, "out/Default_universal", self.BulleBrowser_APP_NAME
             )
             if universal_app.exists():
                 return universal_app
@@ -460,13 +460,13 @@ class Context:
         # For debug builds, check if the app has a different name
         if self.build_type == "debug" and IS_MACOS():
             # Check for debug-branded app name
-            debug_app_name = f"{self.BROWSEROS_APP_BASE_NAME} Dev.app"
+            debug_app_name = f"{self.BulleBrowser_APP_BASE_NAME} Dev.app"
             debug_app_path = join_paths(self.chromium_src, self.out_dir, debug_app_name)
             if debug_app_path.exists():
                 return debug_app_path
 
         # Return architecture-specific path
-        return join_paths(self.chromium_src, self.out_dir, self.BROWSEROS_APP_NAME)
+        return join_paths(self.chromium_src, self.out_dir, self.BulleBrowser_APP_NAME)
 
     def get_chromium_app_path(self) -> Path:
         """Get original Chromium app path"""
@@ -487,13 +487,13 @@ class Context:
             artifact_type: One of "dmg", "appimage", "deb", "installer", "installer_zip"
 
         Returns:
-            Standardized filename, e.g., "BrowserOS_v0.31.0_arm64.dmg"
+            Standardized filename, e.g., "BulleBrowser_v0.31.0_arm64.dmg"
         """
         if not self.semantic_version:
             raise ValueError("semantic_version is not set to generate artifact name")
 
         version = self.semantic_version
-        base = self.BROWSEROS_APP_BASE_NAME
+        base = self.BulleBrowser_APP_BASE_NAME
         arch = self.architecture
 
         match artifact_type:
@@ -511,34 +511,34 @@ class Context:
             case _:
                 raise ValueError(f"Unknown artifact type: {artifact_type}")
 
-    def get_browseros_chromium_version(self) -> str:
-        """Get browseros chromium version string"""
-        return self.browseros_chromium_version
+    def get_BulleBrowser_chromium_version(self) -> str:
+        """Get BulleBrowser chromium version string"""
+        return self.BulleBrowser_chromium_version
 
-    def get_browseros_version(self) -> str:
-        """Get browseros version string (build offset)"""
-        return self.browseros_build_offset
+    def get_BulleBrowser_version(self) -> str:
+        """Get BulleBrowser version string (build offset)"""
+        return self.BulleBrowser_build_offset
 
     def get_semantic_version(self) -> str:
-        """Get semantic version from resources/BROWSEROS_VERSION
+        """Get semantic version from resources/BulleBrowser_VERSION
 
         Returns: e.g., "0.31.0"
         """
         return self.semantic_version
 
     def get_sparkle_version(self) -> str:
-        """Get Sparkle-compatible version from browseros_chromium_version
+        """Get Sparkle-compatible version from BulleBrowser_chromium_version
 
         Sparkle uses BUILD.PATCH format for version comparison.
         Returns: e.g., "7231.69"
         """
-        if not self.browseros_chromium_version:
-            raise ValueError("browseros_chromium_version is not set")
+        if not self.BulleBrowser_chromium_version:
+            raise ValueError("BulleBrowser_chromium_version is not set")
 
-        parts = self.browseros_chromium_version.split(".")
+        parts = self.BulleBrowser_chromium_version.split(".")
         if len(parts) < 4:
             raise ValueError(
-                f"Invalid browseros_chromium_version format: {self.browseros_chromium_version}"
+                f"Invalid BulleBrowser_chromium_version format: {self.BulleBrowser_chromium_version}"
             )
         return f"{parts[2]}.{parts[3]}"
 
@@ -554,7 +554,7 @@ class Context:
 
     def get_app_base_name(self) -> str:
         """Get app base name without extension"""
-        return self.BROWSEROS_APP_BASE_NAME
+        return self.BulleBrowser_APP_BASE_NAME
 
     def get_dist_dir(self) -> Path:
         """Get distribution output directory with semantic version"""
