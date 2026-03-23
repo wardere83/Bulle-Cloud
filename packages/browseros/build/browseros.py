@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-BrowserOS Build System - Main Entry Point
+BulleBrowser Build System - Main Entry Point
 
-Unified CLI for building, developing, and releasing BrowserOS browser.
+Unified CLI for building, developing, and releasing BulleBrowser.
 
 Usage:
     # As installed command:
@@ -12,12 +12,11 @@ Usage:
     python -m build.browseros build --help
 """
 import typer
-
 from .cli import build
 
 # Create main app
 app = typer.Typer(
-    help="BrowserOS Build System",
+    help="BulleBrowser Build System",
     pretty_exceptions_enable=False,
     pretty_exceptions_show_locals=False
 )
@@ -30,7 +29,7 @@ build_app = typer.Typer(
 build_app.callback(invoke_without_command=True)(build.main)
 
 # Add build as a subcommand
-app.add_typer(build_app, name="build", help="Build BrowserOS browser")
+app.add_typer(build_app, name="build", help="Build BulleBrowser browser")
 
 # Add dev command
 from .cli import dev
@@ -43,7 +42,6 @@ app.add_typer(release.app, name="release", help="Release automation")
 # OTA update commands
 from .cli import ota
 app.add_typer(ota.app, name="ota", help="OTA update automation")
-
 
 if __name__ == "__main__":
     app()
