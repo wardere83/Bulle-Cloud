@@ -7,10 +7,16 @@ on:
         description: 'Version tag (e.g. v0.40.1)'
         required: true
         default: 'v0.40.1'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/rebrand-release.yml'
 
 jobs:
   rebrand-and-upload:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
     steps:
@@ -55,7 +61,6 @@ jobs:
           set -e
           VER="${VERSION}"
           REPO="wardere83/Bulle-Cloud"
-
           # Check if release exists, create if not
           if gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
             echo "Release ${VER} already exists, uploading assets..."
@@ -65,11 +70,9 @@ jobs:
               --repo "${REPO}" \
               --title "BulleBrowser ${VER}" \
               --notes "## BulleBrowser ${VER}
-
 The AI-Powered Agentic Browser by Bulle Consulting — built on Chromium with intelligent agents that understand and assist your workflow.
 
 ### Downloads
-
 | Platform | Download |
 |----------|----------|
 | Windows (x64 Installer) | BulleBrowser_${VER}_x64_installer.exe |
@@ -79,11 +82,9 @@ The AI-Powered Agentic Browser by Bulle Consulting — built on Chromium with in
 | macOS (Intel x64) | BulleBrowser_${VER}_x64.dmg |
 | Linux (AppImage) | BulleBrowser_${VER}_x64.AppImage |
 | Linux (deb) | BulleBrowser_${VER}_amd64.deb |
-
 ---
 Powered by [Bulle Consulting](https://bulleconsulting.com)"
           fi
-
           # Upload all renamed assets
           UPLOADED=0
           for FILE in assets/BulleBrowser_*; do
@@ -96,3 +97,12 @@ Powered by [Bulle Consulting](https://bulleconsulting.com)"
             fi
           done
           echo "Uploaded ${UPLOADED} assets to BulleBrowser ${VER}"
+
+  workflow-push-ack:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Acknowledge push trigger
+        run: |
+          echo "rebrand-release.yml updated. Use workflow_dispatch to trigger a release."
+          echo "No release actions taken on push."
