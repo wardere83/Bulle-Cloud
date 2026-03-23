@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extensions modules for BrowserOS build system"""
+"""Extensions modules for BulleBrowser build system"""
 
 from .bundled_extensions import BundledExtensionsModule
 
