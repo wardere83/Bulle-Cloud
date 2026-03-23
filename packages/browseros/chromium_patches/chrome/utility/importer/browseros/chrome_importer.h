@@ -1,15 +1,15 @@
-diff --git a/chrome/utility/importer/browseros/chrome_importer.h b/chrome/utility/importer/browseros/chrome_importer.h
+diff --git a/chrome/utility/importer/bullebrowser/chrome_importer.h b/chrome/utility/importer/bullebrowser/chrome_importer.h
 new file mode 100644
 index 0000000000000..da685413cee76
 --- /dev/null
-+++ b/chrome/utility/importer/browseros/chrome_importer.h
++++ b/chrome/utility/importer/bullebrowser/chrome_importer.h
 @@ -0,0 +1,45 @@
 +// Copyright 2023 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
-+#ifndef CHROME_UTILITY_IMPORTER_BROWSEROS_CHROME_IMPORTER_H_
-+#define CHROME_UTILITY_IMPORTER_BROWSEROS_CHROME_IMPORTER_H_
++#ifndef CHROME_UTILITY_IMPORTER_BULLEBROWSER_CHROME_IMPORTER_H_
++#define CHROME_UTILITY_IMPORTER_BULLEBROWSER_CHROME_IMPORTER_H_
 +
 +#include <stdint.h>
 +
@@ -48,4 +48,4 @@ index 0000000000000..da685413cee76
 +  base::FilePath source_path_;
 +};
 +
-+#endif  // CHROME_UTILITY_IMPORTER_BROWSEROS_CHROME_IMPORTER_H_
++#endif  // CHROME_UTILITY_IMPORTER_BULLEBROWSER_CHROME_IMPORTER_H_
