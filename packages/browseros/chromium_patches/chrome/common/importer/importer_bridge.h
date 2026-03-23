@@ -6,9 +6,9 @@ index 1738a3baff3e4..5f62d61cc7d08 100644
  class GURL;
  struct ImporterAutofillFormDataEntry;
  
-+namespace browseros_importer {
++namespace bullebrowser_importer {
 +struct ImportedCookieEntry;
-+}  // namespace browseros_importer
++}  // namespace bullebrowser_importer
 +
  namespace user_data_importer {
  struct ImportedBookmarkEntry;
@@ -18,7 +18,7 @@ index 1738a3baff3e4..5f62d61cc7d08 100644
        const user_data_importer::ImportedPasswordForm& form) = 0;
  
 +  virtual void SetCookie(
-+      const browseros_importer::ImportedCookieEntry& cookie) = 0;
++      const bullebrowser_importer::ImportedCookieEntry& cookie) = 0;
 +
    virtual void SetAutofillFormData(
        const std::vector<ImporterAutofillFormDataEntry>& entries) = 0;
