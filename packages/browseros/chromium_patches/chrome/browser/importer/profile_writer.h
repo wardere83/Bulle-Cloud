@@ -6,9 +6,9 @@ index f609d99dde302..54119399b48f0 100644
  class AutocompleteEntry;
  }
  
-+namespace browseros_importer {
++namespace bullebrowser_importer {
 +struct ImportedCookieEntry;
-+}  // namespace browseros_importer
++}  // namespace bullebrowser_importer
 +
  namespace password_manager {
  struct PasswordForm;
@@ -17,7 +17,7 @@ index f609d99dde302..54119399b48f0 100644
    // Helper methods for adding data to local stores.
    virtual void AddPasswordForm(const password_manager::PasswordForm& form);
  
-+  virtual void AddCookie(const browseros_importer::ImportedCookieEntry& cookie);
++  virtual void AddCookie(const bullebrowser_importer::ImportedCookieEntry& cookie);
 +
    virtual void AddHistoryPage(const history::URLRows& page,
                                history::VisitSource visit_source);
