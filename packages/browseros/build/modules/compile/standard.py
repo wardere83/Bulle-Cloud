@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standard single-architecture build module for BrowserOS"""
+"""Standard single-architecture build module for BulleBrowser"""
 
 import tempfile
 import shutil
@@ -19,21 +19,21 @@ from ...common.utils import (
 class CompileModule(CommandModule):
     produces = ["built_app"]
     requires = []
-    description = "Build BrowserOS using autoninja"
+    description = "Build BulleBrowser using autoninja"
 
     def validate(self, ctx: Context) -> None:
         if not ctx.chromium_src.exists():
             raise ValidationError(f"Chromium source not found: {ctx.chromium_src}")
 
-        if not ctx.browseros_chromium_version:
-            raise ValidationError("BrowserOS chromium version not set")
+        if not ctx.BulleBrowser_chromium_version:
+            raise ValidationError("BulleBrowser chromium version not set")
 
         args_file = ctx.get_gn_args_file()
         if not args_file.exists():
             raise ValidationError(f"Build not configured - args.gn not found: {args_file}")
 
     def execute(self, ctx: Context) -> None:
-        log_info("\n🔨 Building BrowserOS (this will take a while)...")
+        log_info("\n🔨 Building BulleBrowser (this will take a while)...")
 
         self._create_version_file(ctx)
 
@@ -53,9 +53,9 @@ class CompileModule(CommandModule):
         log_success("Build complete!")
 
     def _create_version_file(self, ctx: Context) -> None:
-        parts = ctx.browseros_chromium_version.split(".")
+        parts = ctx.BulleBrowser_chromium_version.split(".")
         if len(parts) != 4:
-            log_warning(f"Invalid version format: {ctx.browseros_chromium_version}")
+            log_warning(f"Invalid version format: {ctx.BulleBrowser_chromium_version}")
             return
 
         version_content = f"MAJOR={parts[0]}\nMINOR={parts[1]}\nBUILD={parts[2]}\nPATCH={parts[3]}"
@@ -68,7 +68,7 @@ class CompileModule(CommandModule):
         shutil.copy2(temp_path, chrome_version_path)
         Path(temp_path).unlink()
 
-        log_info(f"Created VERSION file: {ctx.browseros_chromium_version}")
+        log_info(f"Created VERSION file: {ctx.BulleBrowser_chromium_version}")
 
 
 def build_target(ctx: Context, target: str) -> bool:
