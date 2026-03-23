@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Base module system for BrowserOS build pipeline
+Base module system for BulleBrowser build pipeline
 
 This module defines the base class for all build modules and the validation framework.
 All build modules should inherit from BuildModule and implement validate() and execute().
