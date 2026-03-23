@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Application signing and notarization module for BrowserOS (macOS)"""
+"""Application signing and notarization module for BulleBrowser (macOS)"""
 
 import os
 import sys
@@ -20,27 +20,27 @@ from ...common.utils import (
     join_paths,
 )
 
-# Central list of BrowserOS Server binaries we need to sign explicitly.
+# Central list of BulleBrowser Server binaries we need to sign explicitly.
 # Each entry controls identifiers, signing options, and entitlement files so
 # adding a new binary is a one-line update here rather than scattered changes.
-BROWSEROS_SERVER_BINARIES: Dict[str, Dict[str, str]] = {
-    "browseros_server": {
-        "identifier_suffix": "browseros_server",
+BulleBrowser_SERVER_BINARIES: Dict[str, Dict[str, str]] = {
+    "BulleBrowser_server": {
+        "identifier_suffix": "BulleBrowser_server",
         "options": "runtime",
-        "entitlements": "browseros-executable-entitlements.plist",
+        "entitlements": "BulleBrowser-executable-entitlements.plist",
     },
     "codex": {
         "identifier_suffix": "codex",
         "options": "runtime",
-        "entitlements": "browseros-executable-entitlements.plist",
+        "entitlements": "BulleBrowser-executable-entitlements.plist",
     },
 }
 
 
-def get_browseros_server_binary_info(component_path: Path) -> Optional[Dict[str, str]]:
-    """Return metadata for known BrowserOS Server binaries, if applicable."""
+def get_BulleBrowser_server_binary_info(component_path: Path) -> Optional[Dict[str, str]]:
+    """Return metadata for known BulleBrowser Server binaries, if applicable."""
     name = component_path.stem.lower()
-    return BROWSEROS_SERVER_BINARIES.get(name)
+    return BulleBrowser_SERVER_BINARIES.get(name)
 
 
 def run_command(
@@ -71,7 +71,7 @@ class MacOSSignModule(CommandModule):
 
     def execute(self, ctx: Context) -> None:
         log_info("=" * 70)
-        log_info("🚀 Starting signing process for BrowserOS...")
+        log_info("🚀 Starting signing process for BulleBrowser...")
         log_info("=" * 70)
 
         app_path = ctx.get_app_path()
@@ -182,11 +182,11 @@ def find_components_to_sign(
 
     framework_path = join_paths(app_path, "Contents", "Frameworks")
 
-    # Check both versioned and non-versioned paths for BrowserOS Framework
+    # Check both versioned and non-versioned paths for BulleBrowser Framework
     # Handle both release and debug framework names
     framework_names = [
-        "BrowserOS Framework.framework",
-        "BrowserOS Dev Framework.framework",
+        "BulleBrowser Framework.framework",
+        "BulleBrowser Dev Framework.framework",
     ]
     nxtscape_framework_paths = []
 
@@ -196,9 +196,9 @@ def find_components_to_sign(
             nxtscape_framework_paths.append(fw_path)
 
             # Add versioned path if context is available
-            if ctx and ctx.browseros_chromium_version:
+            if ctx and ctx.BulleBrowser_chromium_version:
                 versioned_path = join_paths(
-                    fw_path, "Versions", ctx.browseros_chromium_version
+                    fw_path, "Versions", ctx.BulleBrowser_chromium_version
                 )
                 if versioned_path.exists():
                     nxtscape_framework_paths.insert(
@@ -235,7 +235,7 @@ def find_components_to_sign(
                 if autoupdate.exists() and autoupdate.is_file():
                     components["executables"].append(autoupdate)
 
-    # Find all dylibs (check versioned path for BrowserOS Framework libraries)
+    # Find all dylibs (check versioned path for BulleBrowser Framework libraries)
     for nxtscape_fw_path in nxtscape_framework_paths:
         libraries_dir = join_paths(nxtscape_fw_path, "Libraries")
         if libraries_dir.exists():
@@ -251,10 +251,10 @@ def find_components_to_sign(
         if nested_app not in components["helpers"]:
             components["apps"].append(nested_app)
 
-    # Find BrowserOS Server binaries
-    browseros_server_dir = join_paths(app_path, "Contents", "Resources", "BrowserOSServer")
-    if browseros_server_dir.exists():
-        for item in browseros_server_dir.rglob("*"):
+    # Find BulleBrowser Server binaries
+    BulleBrowser_server_dir = join_paths(app_path, "Contents", "Resources", "BulleBrowserServer")
+    if BulleBrowser_server_dir.exists():
+        for item in BulleBrowser_server_dir.rglob("*"):
             if item.is_file() and not item.suffix and os.access(item, os.X_OK):
                 components["executables"].append(item)
 
@@ -262,7 +262,7 @@ def find_components_to_sign(
 
 
 def get_identifier_for_component(
-    component_path: Path, base_identifier: str = "com.browseros"
+    component_path: Path, base_identifier: str = "com.BulleBrowser"
 ) -> str:
     """Generate identifier for a component based on its path and name"""
     name = component_path.stem
@@ -284,10 +284,10 @@ def get_identifier_for_component(
         if key in str(component_path):
             return identifier
 
-    # BrowserOS Server binaries share the same entitlements/options but need unique identifiers.
-    browseros_server_info = get_browseros_server_binary_info(component_path)
-    if browseros_server_info:
-        suffix = browseros_server_info.get("identifier_suffix", component_path.stem)
+    # BulleBrowser Server binaries share the same entitlements/options but need unique identifiers.
+    BulleBrowser_server_info = get_BulleBrowser_server_binary_info(component_path)
+    if BulleBrowser_server_info:
+        suffix = BulleBrowser_server_info.get("identifier_suffix", component_path.stem)
         return f"{base_identifier}.{suffix}"
 
     # For helper apps
@@ -301,7 +301,7 @@ def get_identifier_for_component(
 
     # For frameworks
     if component_path.suffix == ".framework":
-        if name == "BrowserOS Framework" or name == "BrowserOS Dev Framework":
+        if name == "BulleBrowser Framework" or name == "BulleBrowser Dev Framework":
             return f"{base_identifier}.framework"
         else:
             return f"{base_identifier}.{name.replace(' ', '_').lower()}"
@@ -330,10 +330,10 @@ def get_signing_options(component_path: Path) -> str:
     ):
         return "restrict,kill,runtime"
 
-    # Known BrowserOS Server binaries share the same relaxed options.
-    browseros_server_info = get_browseros_server_binary_info(component_path)
-    if browseros_server_info:
-        return browseros_server_info.get("options", "runtime")
+    # Known BulleBrowser Server binaries share the same relaxed options.
+    BulleBrowser_server_info = get_BulleBrowser_server_binary_info(component_path)
+    if BulleBrowser_server_info:
+        return BulleBrowser_server_info.get("options", "runtime")
 
     # For dylibs - library flag ONLY for dynamic libraries
     if component_path.suffix == ".dylib":
@@ -421,9 +421,9 @@ def sign_all_components(
 
             # Check for specific entitlements
             entitlements = None
-            browseros_server_info = get_browseros_server_binary_info(exe)
-            if browseros_server_info:
-                entitlements_name = browseros_server_info.get("entitlements")
+            BulleBrowser_server_info = get_BulleBrowser_server_binary_info(exe)
+            if BulleBrowser_server_info:
+                entitlements_name = BulleBrowser_server_info.get("entitlements")
                 if entitlements_name:
                     for ent_dir in entitlements_dirs:
                         ent_path = join_paths(ent_dir, entitlements_name)
@@ -477,10 +477,10 @@ def sign_all_components(
             ):
                 return False
 
-    # 6. Sign frameworks (except the main BrowserOS Framework)
+    # 6. Sign frameworks (except the main BulleBrowser Framework)
     if components["frameworks"]:
         log_info("\n🔏 Signing frameworks...")
-        # Sort to sign Sparkle.framework before BrowserOS Framework.framework
+        # Sort to sign Sparkle.framework before BulleBrowser Framework.framework
         frameworks_sorted = sorted(
             components["frameworks"], key=lambda x: 0 if "Sparkle" in x.name else 1
         )
@@ -492,7 +492,7 @@ def sign_all_components(
     # 7. Sign main executable
     log_info("\n🔏 Signing main executable...")
     # Handle both release and debug executable names
-    main_exe_names = ["BrowserOS", "BrowserOS Dev"]
+    main_exe_names = ["BulleBrowser", "BulleBrowser Dev"]
     main_exe = None
     for exe_name in main_exe_names:
         exe_path = join_paths(app_path, "Contents", "MacOS", exe_name)
@@ -506,13 +506,13 @@ def sign_all_components(
         )
         return False
 
-    if not sign_component(main_exe, certificate_name, "com.browseros.BrowserOS"):
+    if not sign_component(main_exe, certificate_name, "com.BulleBrowser.BulleBrowser"):
         return False
 
     # 8. Finally sign the app bundle
     log_info("\n🔏 Signing application bundle...")
     requirements = (
-        '=designated => identifier "com.browseros.BrowserOS" and '
+        '=designated => identifier "com.BulleBrowser.BulleBrowser" and '
         "anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and "
         "certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */"
     )
@@ -553,7 +553,7 @@ def sign_all_components(
         "--force",
         "--timestamp",
         "--identifier",
-        "com.browseros.BrowserOS",
+        "com.BulleBrowser.BulleBrowser",
         "--options",
         "restrict,library,runtime,kill",
         "--requirements",
@@ -704,7 +704,7 @@ def notarize_app(
 def sign_app(ctx: Context, create_dmg: bool = True) -> bool:
     """Main signing function that uses BuildContext from build.py"""
     log_info("=" * 70)
-    log_info("🚀 Starting signing process for BrowserOS...")
+    log_info("🚀 Starting signing process for BulleBrowser...")
     log_info("=" * 70)
 
     # Error tracking similar to bash script
@@ -772,7 +772,7 @@ def sign_app(ctx: Context, create_dmg: bool = True) -> bool:
                 app_path=app_path,
                 dmg_path=dmg_path,
                 certificate_name=env_vars["certificate_name"],
-                volume_name="BrowserOS",
+                volume_name="BulleBrowser",
                 pkg_dmg_path=pkg_dmg_path,
                 keychain_profile="notarytool-profile",
             ):
@@ -827,7 +827,7 @@ def sign_universal(contexts: List[Context]) -> bool:
 
     # Create universal output directory
     universal_dir = join_paths(contexts[0].chromium_src, "out", "Default_universal")
-    universal_app_path = join_paths(universal_dir, contexts[0].BROWSEROS_APP_NAME)
+    universal_app_path = join_paths(universal_dir, contexts[0].BulleBrowser_APP_NAME)
 
     if universal_dir.exists():
         log_info("Removing existing universal directory...")
