@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Environment variable configuration for BrowserOS build system
-
+    Environment variable configuration for BulleBrowser build system
 This module provides centralized access to all environment variables used by the build system.
 It provides type-safe access, defaults, and clear documentation of what each variable is for.
 
