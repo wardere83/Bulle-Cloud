@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DMG creation and packaging module for BrowserOS"""
+"""DMG creation and packaging module for BulleBrowser"""
 
 import shutil
 from pathlib import Path
@@ -56,7 +56,7 @@ class MacOSPackageModule(CommandModule):
         )
 
     def _create_dmg(self, app_path: Path, dmg_path: Path, pkg_dmg_path: Path) -> None:
-        if not create_dmg(app_path, dmg_path, "BrowserOS", pkg_dmg_path):
+        if not create_dmg(app_path, dmg_path, "BulleBrowser", pkg_dmg_path):
             raise RuntimeError("Failed to create DMG")
 
     def _create_signed_notarized_dmg(
@@ -72,13 +72,15 @@ class MacOSPackageModule(CommandModule):
         keychain_profile = env_vars.get("keychain_profile", "notarytool-profile")
 
         if not create_signed_notarized_dmg(
-            app_path, dmg_path, certificate_name, "BrowserOS", pkg_dmg_path, keychain_profile
+            app_path, dmg_path, certificate_name, "BulleBrowser", pkg_dmg_path, keychain_profile
         ):
             raise RuntimeError("Failed to create signed and notarized DMG")
+
+
 def create_dmg(
     app_path: Path,
     dmg_path: Path,
-    volume_name: str = "BrowserOS",
+    volume_name: str = "BulleBrowser",
     pkg_dmg_path: Optional[Path] = None,
 ) -> bool:
     """Create a DMG package from an app bundle"""
@@ -94,12 +96,11 @@ def create_dmg(
 
     # Remove existing DMG if present
     if dmg_path.exists():
-        log_info(f"  Removing existing DMG: {dmg_path.name}")
+        log_info(f" Removing existing DMG: {dmg_path.name}")
         dmg_path.unlink()
 
     # Build command
     cmd = []
-
     if pkg_dmg_path and pkg_dmg_path.exists():
         # Use Chromium's pkg-dmg tool if available
         cmd = [str(pkg_dmg_path)]
@@ -164,7 +165,6 @@ def sign_dmg(dmg_path: Path, certificate_name: str) -> bool:
         # Verify signature
         log_info("🔍 Verifying DMG signature...")
         run_command(["codesign", "-vvv", str(dmg_path)])
-
         log_success("DMG signed successfully")
         return True
     except Exception as e:
@@ -195,7 +195,6 @@ def notarize_dmg(dmg_path: Path, keychain_profile: str = "notarytool-profile") -
             ],
             check=False,
         )
-
         log_info(result.stdout)
         if result.stderr:
             log_error(result.stderr)
@@ -222,23 +221,20 @@ def notarize_dmg(dmg_path: Path, keychain_profile: str = "notarytool-profile") -
         # Staple the ticket
         log_info("📎 Stapling notarization ticket to DMG...")
         result = run_command(["xcrun", "stapler", "staple", str(dmg_path)], check=False)
-
         if result.returncode != 0:
             log_error("Failed to staple notarization ticket to DMG")
             return False
-
         log_success("DMG notarization ticket stapled successfully")
 
         # Verify stapling
         log_info("🔍 Verifying DMG stapling...")
         result = run_command(
-            ["xcrun", "stapler", "validate", str(dmg_path)], check=False
+            ["xcrun", "stapler", "validate", str(dmg_path)],
+            check=False
         )
-
         if result.returncode != 0:
             log_error("DMG stapling verification failed")
             return False
-
         log_success("DMG stapling verification successful")
 
         # Final security assessment
@@ -256,14 +252,11 @@ def notarize_dmg(dmg_path: Path, keychain_profile: str = "notarytool-profile") -
             ],
             check=False,
         )
-
         if result.returncode != 0:
             log_error("Final security assessment failed")
             return False
-
         log_success("Final security assessment passed")
         return True
-
     except Exception as e:
         log_error(f"Unexpected error during DMG notarization: {e}")
         return False
@@ -273,7 +266,7 @@ def create_signed_notarized_dmg(
     app_path: Path,
     dmg_path: Path,
     certificate_name: str,
-    volume_name: str = "BrowserOS",
+    volume_name: str = "BulleBrowser",
     pkg_dmg_path: Optional[Path] = None,
     keychain_profile: str = "notarytool-profile",
 ) -> bool:
@@ -326,7 +319,7 @@ def package_universal(contexts: List[Context]) -> bool:
         build_type=contexts[0].build_type,
     )
 
-    # Create DMG in dist/<version> directory
+    # Create DMG in dist/ directory
     dmg_dir = universal_ctx.get_dist_dir()
     dmg_dir.mkdir(parents=True, exist_ok=True)
 
@@ -338,7 +331,7 @@ def package_universal(contexts: List[Context]) -> bool:
     pkg_dmg_path = contexts[0].get_pkg_dmg_path()
 
     # Create the universal DMG
-    if create_dmg(universal_app_path, dmg_path, "BrowserOS", pkg_dmg_path):
+    if create_dmg(universal_app_path, dmg_path, "BulleBrowser", pkg_dmg_path):
         log_success(f"Universal DMG created: {dmg_name}")
         return True
     else:
