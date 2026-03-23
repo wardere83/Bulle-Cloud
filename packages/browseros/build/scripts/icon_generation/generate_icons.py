@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unified icon generation script for BrowserOS.
+Unified icon generation script for BulleBrowser.
 
 Generates all platform-specific icons (Windows, macOS, Linux, ChromeOS) from
 a single high-resolution source PNG.
@@ -387,7 +387,7 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Generate BrowserOS icons")
+    parser = argparse.ArgumentParser(description="Generate BulleBrowser icons")
     parser.add_argument(
         "--config",
         type=Path,
@@ -403,7 +403,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("BrowserOS Icon Generation")
+    print("BulleBrowser Icon Generation")
     print("=" * 60)
     print(f"Config: {args.config}")
     print(f"Output: {args.output}")
