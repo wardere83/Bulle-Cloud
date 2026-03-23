@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Compilation modules for BrowserOS build system
+Compilation modules for BulleBrowser build system
 
 This package contains different build strategies:
 - standard: Single-architecture compilation
