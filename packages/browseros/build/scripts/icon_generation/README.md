@@ -1,6 +1,6 @@
-# BrowserOS Icon Generation
+# BulleBrowser Icon Generation
 
-This directory contains the unified icon generation system for BrowserOS. All browser icons
+This directory contains the unified icon generation system for BulleBrowser. All browser icons
 for Windows, macOS, Linux, and ChromeOS are generated from a single source image.
 
 ## Quick Start
@@ -15,7 +15,7 @@ cp your_logo.svg static/product_logo.svg
 # 3. Run generation
 python generate_icons.py
 
-# 4. Icons are output to packages/browseros/resources/icons/
+# 4. Icons are output to packages/BulleBrowser/resources/icons/
 ```
 
 ## Directory Structure
@@ -149,7 +149,7 @@ COPY   source dest          # Copy static file as-is
 
 1. **Update source icon**: Replace `source/app_icon.png` with your new icon (≥1024x1024)
 2. **Run generation**: `python generate_icons.py`
-3. **Build BrowserOS**: The `copy_resources.yaml` copies generated icons to chromium source tree
+3. **Build BulleBrowser**: The `copy_resources.yaml` copies generated icons to chromium source tree
 
 ## Troubleshooting
 
