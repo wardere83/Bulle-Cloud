@@ -16,7 +16,7 @@ on:
 jobs:
   rebrand-and-upload:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     steps:
@@ -29,7 +29,6 @@ jobs:
           VER="${VERSION}"
           mkdir -p assets
           echo "Downloading BrowserOS ${VER} assets..."
-          # BrowserOS uses format: BrowserOS_v0.40.1_x64_installer.exe
           FILES=(
             "BrowserOS_${VER}_amd64.deb"
             "BrowserOS_${VER}_arm64.dmg"
@@ -61,7 +60,6 @@ jobs:
           set -e
           VER="${VERSION}"
           REPO="wardere83/Bulle-Cloud"
-          # Check if release exists, create if not
           if gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
             echo "Release ${VER} already exists, uploading assets..."
           else
@@ -70,7 +68,8 @@ jobs:
               --repo "${REPO}" \
               --title "BulleBrowser ${VER}" \
               --notes "## BulleBrowser ${VER}
-The AI-Powered Agentic Browser by Bulle Consulting — built on Chromium with intelligent agents that understand and assist your workflow.
+
+The AI-Powered Agentic Browser by Bulle Consulting.
 
 ### Downloads
 | Platform | Download |
@@ -82,10 +81,10 @@ The AI-Powered Agentic Browser by Bulle Consulting — built on Chromium with in
 | macOS (Intel x64) | BulleBrowser_${VER}_x64.dmg |
 | Linux (AppImage) | BulleBrowser_${VER}_x64.AppImage |
 | Linux (deb) | BulleBrowser_${VER}_amd64.deb |
+
 ---
-Powered by [Bulle Consulting](https://bulleconsulting.com)"
+Powered by [Bulle Consulting](https://bulleconsulting.com/bullebrowser)"
           fi
-          # Upload all renamed assets
           UPLOADED=0
           for FILE in assets/BulleBrowser_*; do
             if [ -f "${FILE}" ]; then
@@ -100,9 +99,10 @@ Powered by [Bulle Consulting](https://bulleconsulting.com)"
 
   workflow-push-ack:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: ${{ github.event_name == 'push' }}
     steps:
-      - name: Acknowledge push trigger
+      - name: Acknowledge workflow file update
         run: |
-          echo "rebrand-release.yml updated. Use workflow_dispatch to trigger a release."
-          echo "No release actions taken on push."
+          echo "rebrand-release.yml was updated on push."
+          echo "To trigger a release, use Actions > workflow_dispatch."
+          echo "No release actions taken on push events."
