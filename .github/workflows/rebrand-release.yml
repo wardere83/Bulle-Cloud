@@ -1,4 +1,5 @@
 name: BulleBrowser - Rebrand & Release
+# Patches BrowserOS DMG app bundle to BulleBrowser branding
 
 on:
   workflow_dispatch:
