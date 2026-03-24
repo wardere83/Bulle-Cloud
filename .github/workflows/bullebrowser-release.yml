@@ -1,0 +1,159 @@
+name: BulleBrowser - Release
+# Manual dispatch only - no push trigger
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'BrowserOS version tag to rebrand (e.g. v0.44.0.1)'
+        required: true
+        default: 'v0.44.0.1'
+
+jobs:
+  rebrand-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          brew install create-dmg imagemagick || true
+
+      - name: Download BrowserOS macOS DMGs
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+          VER="${VERSION}"
+          mkdir -p work release
+          for ARCH in arm64 x64 universal; do
+            FNAME="BrowserOS_${VER}_${ARCH}.dmg"
+            URL="https://github.com/browseros-ai/BrowserOS/releases/download/${VER}/${FNAME}"
+            echo "Downloading ${FNAME}..."
+            if wget -q -O "work/${FNAME}" "${URL}"; then
+              echo "  OK: ${FNAME}"
+            else
+              echo "  SKIP: ${FNAME}"
+              rm -f "work/${FNAME}"
+            fi
+          done
+          ls -lh work/
+
+      - name: Rebrand each DMG
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+          VER="${VERSION}"
+          LOGO="packages/browseros/resources/BulleBrowser.png"
+          for SRC_DMG in work/BrowserOS_*.dmg; do
+            [ -f "${SRC_DMG}" ] || continue
+            FNAME=$(basename "${SRC_DMG}")
+            ARCH=$(echo "${FNAME}" | sed 's/BrowserOS_.*_\(.*\)\.dmg/\1/')
+            DEST_DMG="release/BulleBrowser_${VER}_${ARCH}.dmg"
+            echo "=== Rebranding ${FNAME} -> $(basename ${DEST_DMG}) ==="
+            MOUNT_DIR="/Volumes/BrowserOS_${ARCH}"
+            hdiutil attach "${SRC_DMG}" -mountpoint "${MOUNT_DIR}" -nobrowse -quiet
+            SRC_APP=$(find "${MOUNT_DIR}" -maxdepth 2 -name "*.app" | head -1)
+            echo "  Source app: ${SRC_APP}"
+            WORK_APP="/tmp/BulleBrowser_${ARCH}.app"
+            rm -rf "${WORK_APP}"
+            cp -R "${SRC_APP}" "${WORK_APP}"
+            hdiutil detach "${MOUNT_DIR}" -quiet || true
+            PLIST="${WORK_APP}/Contents/Info.plist"
+            if [ -f "${PLIST}" ]; then
+              plutil -replace CFBundleName -string "BulleBrowser" "${PLIST}"
+              plutil -replace CFBundleDisplayName -string "BulleBrowser" "${PLIST}"
+              plutil -replace CFBundleIdentifier -string "com.bulleconsulting.bullebrowser" "${PLIST}"
+              plutil -remove SUFeedURL "${PLIST}" 2>/dev/null || true
+              echo "  Info.plist patched."
+            fi
+            if [ -f "${LOGO}" ]; then
+              ICONSET_DIR="/tmp/BulleBrowser.iconset"
+              rm -rf "${ICONSET_DIR}" && mkdir "${ICONSET_DIR}"
+              for SIZE in 16 32 64 128 256 512 1024; do
+                sips -z ${SIZE} ${SIZE} "${LOGO}" --out "${ICONSET_DIR}/icon_${SIZE}x${SIZE}.png" 2>/dev/null || true
+              done
+              for SIZE in 16 32 128 256 512; do
+                SIZE2=$((SIZE * 2))
+                cp "${ICONSET_DIR}/icon_${SIZE2}x${SIZE2}.png" "${ICONSET_DIR}/icon_${SIZE}x${SIZE}@2x.png" 2>/dev/null || true
+              done
+              iconutil -c icns "${ICONSET_DIR}" -o "/tmp/BulleBrowser.icns" 2>/dev/null || true
+              if [ -f "/tmp/BulleBrowser.icns" ]; then
+                find "${WORK_APP}/Contents/Resources" -name "*.icns" | while read F; do
+                  cp "/tmp/BulleBrowser.icns" "${F}"
+                  echo "  Replaced icon: $(basename ${F})"
+                done
+              fi
+            fi
+            WORK_RENAMED="/tmp/BulleBrowser.app"
+            rm -rf "${WORK_RENAMED}"
+            mv "${WORK_APP}" "${WORK_RENAMED}"
+            create-dmg \
+              --volname "BulleBrowser" \
+              --window-pos 200 120 \
+              --window-size 600 400 \
+              --icon-size 100 \
+              --icon "BulleBrowser.app" 175 190 \
+              --hide-extension "BulleBrowser.app" \
+              --app-drop-link 425 190 \
+              "${DEST_DMG}" \
+              "${WORK_RENAMED}" || \
+            hdiutil create -volname "BulleBrowser" \
+              -srcfolder "${WORK_RENAMED}" \
+              -ov -format UDZO \
+              "${DEST_DMG}"
+            echo "  Done: $(du -sh ${DEST_DMG} | cut -f1)"
+            rm -rf "${WORK_RENAMED}" "/tmp/BulleBrowser.icns" "${ICONSET_DIR}"
+          done
+          ls -lh release/
+
+      - name: Download Linux and Windows (rename only)
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+          VER="${VERSION}"
+          for SRC in "BrowserOS_${VER}_amd64.deb" "BrowserOS_${VER}_x64.AppImage" "BrowserOS_${VER}_x64_installer.exe" "BrowserOS_${VER}_x64_installer.zip"; do
+            DEST="release/$(echo ${SRC} | sed 's/BrowserOS/BulleBrowser/')"
+            wget -q -O "${DEST}" "https://github.com/browseros-ai/BrowserOS/releases/download/${VER}/${SRC}" && \
+              echo "OK: $(basename ${DEST})" || { echo "SKIP: ${SRC}"; rm -f "${DEST}"; }
+          done
+          ls -lh release/
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          set -e
+          VER="${VERSION}"
+          REPO="wardere83/Bulle-Cloud"
+          if ! gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
+            cat > /tmp/notes.md << 'EOF'
+## BulleBrowser
+The AI-Powered Agentic Browser by Bulle Consulting.
+
+### Downloads
+| Platform | File |
+|----------|------|
+| macOS Universal | BulleBrowser_*_universal.dmg |
+| macOS Apple Silicon | BulleBrowser_*_arm64.dmg |
+| macOS Intel | BulleBrowser_*_x64.dmg |
+| Linux AppImage | BulleBrowser_*_x64.AppImage |
+| Linux deb | BulleBrowser_*_amd64.deb |
+| Windows Installer | BulleBrowser_*_x64_installer.exe |
+| Windows ZIP | BulleBrowser_*_x64_installer.zip |
+
+Powered by [Bulle Consulting](https://bulleconsulting.com/bullebrowser)
+EOF
+            gh release create "${VER}" --repo "${REPO}" --title "BulleBrowser ${VER}" --notes-file /tmp/notes.md
+          fi
+          for FILE in release/BulleBrowser_*; do
+            [ -f "${FILE}" ] || continue
+            gh release upload "${VER}" "${FILE}" --repo "${REPO}" --clobber
+            echo "Uploaded: $(basename ${FILE})"
+          done
