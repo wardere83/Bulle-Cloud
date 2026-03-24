@@ -14,9 +14,60 @@ on:
       - '.github/workflows/rebrand-release.yml'
 
 jobs:
+  replace-icons:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Replace product icons with BulleBrowser logo
+        run: |
+          set -e
+          LOGO="packages/browseros/resources/BulleBrowser.png"
+          if [ ! -f "${LOGO}" ]; then
+            echo "BulleBrowser.png not found at ${LOGO}"
+            exit 1
+          fi
+          echo "Replacing product icons with BulleBrowser logo..."
+          ICON_PATHS=(
+            "packages/browseros/resources/icons/product_logo.png"
+            "packages/browseros/resources/icons/product_logo_1024.png"
+            "packages/browseros/resources/icons/chromeos/chrome_app_icon_32.png"
+            "packages/browseros/resources/icons/chromeos/chrome_app_icon_192.png"
+            "packages/browseros/resources/icons/chromeos/crosh_app_icon_256.png"
+            "packages/browseros/resources/icons/linux/product_logo_32.png"
+            "packages/browseros/resources/icons/linux/product_logo_48.png"
+            "packages/browseros/resources/icons/linux/product_logo_64.png"
+            "packages/browseros/resources/icons/linux/product_logo_128.png"
+            "packages/browseros/resources/icons/linux/product_logo_256.png"
+          )
+          for ICON in "${ICON_PATHS[@]}"; do
+            if [ -f "${ICON}" ]; then
+              cp "${LOGO}" "${ICON}"
+              echo "  Replaced: ${ICON}"
+            else
+              echo "  Skipped (not found): ${ICON}"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No icon changes to commit."
+          else
+            git commit -m "chore: replace product icons with BulleBrowser logo"
+            git push
+            echo "Icons updated and pushed."
+          fi
+
   rebrand-and-upload:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     env:
@@ -24,6 +75,9 @@ jobs:
       REPO: wardere83/Bulle-Cloud
     steps:
       - name: Download BrowserOS assets and rename to BulleBrowser
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           set -e
           VER="${VERSION}"
@@ -49,39 +103,39 @@ jobs:
               rm -f "assets/${DEST}"
             fi
           done
+          echo "Assets ready:"
           ls -lh assets/ || echo "No assets downloaded"
+
+      - name: Create or update BulleBrowser GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Write release notes
+          VERSION: ${{ github.event.inputs.version }}
         run: |
-          cat > /tmp/release_notes.md << 'NOTES'
-          ## BulleBrowser ${{ github.event.inputs.version }}
-
+          set -e
+          VER="${VERSION}"
+          REPO="wardere83/Bulle-Cloud"
+          if gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
+            echo "Release ${VER} already exists, uploading assets..."
+          else
+            echo "Creating release ${VER}..."
+            cat > /tmp/release_notes.md << 'NOTES'
+          ## BulleBrowser ${VER}
           The AI-Powered Agentic Browser by Bulle Consulting.
 
           ### Downloads
           | Platform | Download |
           |----------|----------|
-          | Windows (x64 Installer) | BulleBrowser_${{ github.event.inputs.version }}_x64_installer.exe |
-          | Windows (x64 ZIP) | BulleBrowser_${{ github.event.inputs.version }}_x64_installer.zip |
-          | macOS (Universal) | BulleBrowser_${{ github.event.inputs.version }}_universal.dmg |
-          | macOS (Apple Silicon) | BulleBrowser_${{ github.event.inputs.version }}_arm64.dmg |
-          | macOS (Intel x64) | BulleBrowser_${{ github.event.inputs.version }}_x64.dmg |
-          | Linux (AppImage) | BulleBrowser_${{ github.event.inputs.version }}_x64.AppImage |
-          | Linux (deb) | BulleBrowser_${{ github.event.inputs.version }}_amd64.deb |
+          | Windows (x64 Installer) | BulleBrowser_${VER}_x64_installer.exe |
+          | Windows (x64 ZIP) | BulleBrowser_${VER}_x64_installer.zip |
+          | macOS (Universal) | BulleBrowser_${VER}_universal.dmg |
+          | macOS (Apple Silicon) | BulleBrowser_${VER}_arm64.dmg |
+          | macOS (Intel x64) | BulleBrowser_${VER}_x64.dmg |
+          | Linux (AppImage) | BulleBrowser_${VER}_x64.AppImage |
+          | Linux (deb) | BulleBrowser_${VER}_amd64.deb |
 
           ---
           Powered by [Bulle Consulting](https://bulleconsulting.com/bullebrowser)
           NOTES
-
-      - name: Create or update BulleBrowser GitHub release
-        run: |
-          set -e
-          VER="${VERSION}"
-          if gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
-            echo "Release ${VER} exists, uploading assets..."
-          else
             gh release create "${VER}" \
               --repo "${REPO}" \
               --title "BulleBrowser ${VER}" \
@@ -90,19 +144,22 @@ jobs:
           UPLOADED=0
           for FILE in assets/BulleBrowser_*; do
             if [ -f "${FILE}" ]; then
-              gh release upload "${VER}" "${FILE}" --repo "${REPO}" --clobber
+              echo "  Uploading $(basename ${FILE})..."
+              gh release upload "${VER}" "${FILE}" \
+                --repo "${REPO}" \
+                --clobber
               UPLOADED=$((UPLOADED + 1))
             fi
           done
           echo "Uploaded ${UPLOADED} assets to BulleBrowser ${VER}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   workflow-push-ack:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: ${{ github.event_name == 'push' }}
+    needs: replace-icons
     steps:
-      - name: Acknowledge workflow file update on push
+      - name: Acknowledge workflow file update
         run: |
-          echo "rebrand-release.yml updated. Use workflow_dispatch to trigger a release."
-          echo "No release actions taken on push."
+          echo "rebrand-release.yml was updated on push."
+          echo "Icon replacement job completed."
+          echo "To trigger a release, use Actions > workflow_dispatch."
