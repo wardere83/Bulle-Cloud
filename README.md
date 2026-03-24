@@ -10,6 +10,7 @@
 
 </div>
 
+<!-- BulleBrowser release workflow: use Actions > bullebrowser-release.yml > Run workflow -->
 ---
 
 🌐 **BulleBrowser** is an open-source Chromium-based browser that runs AI agents natively. Built on BrowserOS, **fully rebranded for Bulle Consulting** — the privacy-first agentic browser alternative to ChatGPT Atlas, Perplexity Comet, and Dia.
