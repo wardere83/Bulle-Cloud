@@ -7,67 +7,10 @@ on:
         description: 'Version tag (e.g. v0.40.1)'
         required: true
         default: 'v0.40.1'
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/rebrand-release.yml'
 
 jobs:
-  replace-icons:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Replace product icons with BulleBrowser logo
-        run: |
-          set -e
-          LOGO="packages/browseros/resources/BulleBrowser.png"
-          if [ ! -f "${LOGO}" ]; then
-            echo "BulleBrowser.png not found at ${LOGO}"
-            exit 1
-          fi
-          echo "Replacing product icons with BulleBrowser logo..."
-          ICON_PATHS=(
-            "packages/browseros/resources/icons/product_logo.png"
-            "packages/browseros/resources/icons/product_logo_1024.png"
-            "packages/browseros/resources/icons/chromeos/chrome_app_icon_32.png"
-            "packages/browseros/resources/icons/chromeos/chrome_app_icon_192.png"
-            "packages/browseros/resources/icons/chromeos/crosh_app_icon_256.png"
-            "packages/browseros/resources/icons/linux/product_logo_32.png"
-            "packages/browseros/resources/icons/linux/product_logo_48.png"
-            "packages/browseros/resources/icons/linux/product_logo_64.png"
-            "packages/browseros/resources/icons/linux/product_logo_128.png"
-            "packages/browseros/resources/icons/linux/product_logo_256.png"
-          )
-          for ICON in "${ICON_PATHS[@]}"; do
-            if [ -f "${ICON}" ]; then
-              cp "${LOGO}" "${ICON}"
-              echo "  Replaced: ${ICON}"
-            else
-              echo "  Skipped (not found): ${ICON}"
-            fi
-          done
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --staged --quiet; then
-            echo "No icon changes to commit."
-          else
-            git commit -m "chore: replace product icons with BulleBrowser logo"
-            git push
-            echo "Icons updated and pushed."
-          fi
-
   rebrand-and-upload:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
     env:
@@ -152,14 +95,3 @@ jobs:
             fi
           done
           echo "Uploaded ${UPLOADED} assets to BulleBrowser ${VER}"
-
-  workflow-push-ack:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
-    needs: replace-icons
-    steps:
-      - name: Acknowledge workflow file update
-        run: |
-          echo "rebrand-release.yml was updated on push."
-          echo "Icon replacement job completed."
-          echo "To trigger a release, use Actions > workflow_dispatch."
