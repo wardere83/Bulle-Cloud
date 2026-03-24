@@ -16,14 +16,14 @@ on:
 jobs:
   rebrand-and-upload:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
+    env:
+      VERSION: ${{ github.event.inputs.version }}
+      REPO: wardere83/Bulle-Cloud
     steps:
       - name: Download BrowserOS assets and rename to BulleBrowser
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.event.inputs.version }}
         run: |
           set -e
           VER="${VERSION}"
@@ -49,60 +49,60 @@ jobs:
               rm -f "assets/${DEST}"
             fi
           done
-          echo "Assets ready:"
           ls -lh assets/ || echo "No assets downloaded"
-
-      - name: Create or update BulleBrowser GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ github.event.inputs.version }}
+
+      - name: Write release notes
+        run: |
+          cat > /tmp/release_notes.md << 'NOTES'
+          ## BulleBrowser ${{ github.event.inputs.version }}
+
+          The AI-Powered Agentic Browser by Bulle Consulting.
+
+          ### Downloads
+          | Platform | Download |
+          |----------|----------|
+          | Windows (x64 Installer) | BulleBrowser_${{ github.event.inputs.version }}_x64_installer.exe |
+          | Windows (x64 ZIP) | BulleBrowser_${{ github.event.inputs.version }}_x64_installer.zip |
+          | macOS (Universal) | BulleBrowser_${{ github.event.inputs.version }}_universal.dmg |
+          | macOS (Apple Silicon) | BulleBrowser_${{ github.event.inputs.version }}_arm64.dmg |
+          | macOS (Intel x64) | BulleBrowser_${{ github.event.inputs.version }}_x64.dmg |
+          | Linux (AppImage) | BulleBrowser_${{ github.event.inputs.version }}_x64.AppImage |
+          | Linux (deb) | BulleBrowser_${{ github.event.inputs.version }}_amd64.deb |
+
+          ---
+          Powered by [Bulle Consulting](https://bulleconsulting.com/bullebrowser)
+          NOTES
+
+      - name: Create or update BulleBrowser GitHub release
         run: |
           set -e
           VER="${VERSION}"
-          REPO="wardere83/Bulle-Cloud"
           if gh release view "${VER}" --repo "${REPO}" > /dev/null 2>&1; then
-            echo "Release ${VER} already exists, uploading assets..."
+            echo "Release ${VER} exists, uploading assets..."
           else
-            echo "Creating release ${VER}..."
             gh release create "${VER}" \
               --repo "${REPO}" \
               --title "BulleBrowser ${VER}" \
-              --notes "## BulleBrowser ${VER}
-
-The AI-Powered Agentic Browser by Bulle Consulting.
-
-### Downloads
-| Platform | Download |
-|----------|----------|
-| Windows (x64 Installer) | BulleBrowser_${VER}_x64_installer.exe |
-| Windows (x64 ZIP) | BulleBrowser_${VER}_x64_installer.zip |
-| macOS (Universal) | BulleBrowser_${VER}_universal.dmg |
-| macOS (Apple Silicon) | BulleBrowser_${VER}_arm64.dmg |
-| macOS (Intel x64) | BulleBrowser_${VER}_x64.dmg |
-| Linux (AppImage) | BulleBrowser_${VER}_x64.AppImage |
-| Linux (deb) | BulleBrowser_${VER}_amd64.deb |
-
----
-Powered by [Bulle Consulting](https://bulleconsulting.com/bullebrowser)"
+              --notes-file /tmp/release_notes.md
           fi
           UPLOADED=0
           for FILE in assets/BulleBrowser_*; do
             if [ -f "${FILE}" ]; then
-              echo "  Uploading $(basename ${FILE})..."
-              gh release upload "${VER}" "${FILE}" \
-                --repo "${REPO}" \
-                --clobber
+              gh release upload "${VER}" "${FILE}" --repo "${REPO}" --clobber
               UPLOADED=$((UPLOADED + 1))
             fi
           done
           echo "Uploaded ${UPLOADED} assets to BulleBrowser ${VER}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   workflow-push-ack:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
+    if: github.event_name == 'push'
     steps:
-      - name: Acknowledge workflow file update
+      - name: Acknowledge workflow file update on push
         run: |
-          echo "rebrand-release.yml was updated on push."
-          echo "To trigger a release, use Actions > workflow_dispatch."
-          echo "No release actions taken on push events."
+          echo "rebrand-release.yml updated. Use workflow_dispatch to trigger a release."
+          echo "No release actions taken on push."
